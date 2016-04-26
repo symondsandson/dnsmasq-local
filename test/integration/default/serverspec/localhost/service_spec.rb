@@ -13,11 +13,9 @@ describe 'dnsmasq-local::default::service' do
     end
   end
 
-  describe command('host -t a google.com') do
-    it 'indicates DNS lookups are succeeding' do
-      expect(subject.exit_status).to eq(0)
-      expected = /^google\.com has address [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/
-      expect(subject.stdout).to match(expected)
+  describe file('/run/resolvconf/resolv.conf') do
+    it 'is using localhost as the nameserver' do
+      expect(subject.content).to match(/^nameserver 127\.0\.0\.1$/)
     end
   end
 end
