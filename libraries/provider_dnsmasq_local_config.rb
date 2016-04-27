@@ -68,7 +68,7 @@ class Chef
       # @return [String] a config file body
       #
       def config_body_for(config)
-        config.sort.to_h.map do |k, v|
+        Hash[config.sort].map do |k, v|
           case v
           when TrueClass, FalseClass
             k.to_s.tr('_', '-') if v
