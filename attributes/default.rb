@@ -1,7 +1,7 @@
 # Encoding: UTF-8
 #
 # Cookbook Name:: dnsmasq-local
-# Recipe:: default
+# Attributes:: default
 #
 # Copyright 2016, Socrata, Inc.
 #
@@ -18,8 +18,4 @@
 # limitations under the License.
 #
 
-config = node['dnsmasq_local']['config']
-
-dnsmasq_local 'default' do
-  config config unless config.empty?
-end
+default['dnsmasq_local']['config'] = {}

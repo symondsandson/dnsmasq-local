@@ -1,7 +1,7 @@
 # Encoding: UTF-8
 #
 # Cookbook Name:: dnsmasq-local
-# Recipe:: default
+# Library:: matchers
 #
 # Copyright 2016, Socrata, Inc.
 #
@@ -18,8 +18,19 @@
 # limitations under the License.
 #
 
-config = node['dnsmasq_local']['config']
+if defined?(ChefSpec)
+  {
+    dnsmasq_local: [:create, :remove],
+    dnsmasq_local_app: [:install, :remove],
+    dnsmasq_local_config: [:create, :remove],
+    dnsmasq_local_service: [:enable, :disable, :stop, :start, :restart]
+  }.each do |matcher, actions|
+    ChefSpec.define_matcher(matcher)
 
-dnsmasq_local 'default' do
-  config config unless config.empty?
+    actions.each do |action|
+      define_method("#{action}_#{matcher}") do |name|
+        ChefSpec::Matchers::ResourceMatcher.new(matcher, action, name)
+      end
+    end
+  end
 end

@@ -17,6 +17,9 @@ Requirements
 
 This cookbook currently supports Ubuntu only.
 
+At least for the time being, it supports Chef 11+, at the expense of some
+additional complexity to maintain backwards compatibility.
+
 Usage
 =====
 

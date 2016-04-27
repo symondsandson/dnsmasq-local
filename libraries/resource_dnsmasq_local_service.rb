@@ -1,7 +1,7 @@
 # Encoding: UTF-8
 #
 # Cookbook Name:: dnsmasq-local
-# Recipe:: default
+# Library:: resource_dnsmasq_local_service
 #
 # Copyright 2016, Socrata, Inc.
 #
@@ -18,8 +18,17 @@
 # limitations under the License.
 #
 
-config = node['dnsmasq_local']['config']
+require 'chef/resource/lwrp_base'
 
-dnsmasq_local 'default' do
-  config config unless config.empty?
+class Chef
+  class Resource
+    # A Chef resource for acting on the dnsmasq service.
+    #
+    # @author Jonathan Hartman <jonathan.hartman@socrata.com>
+    class DnsmasqLocalService < LWRPBase
+      self.resource_name = :dnsmasq_local_service
+      actions Chef::Resource::Service.new('_', nil).allowed_actions
+      default_action [:enable, :start]
+    end
+  end
 end

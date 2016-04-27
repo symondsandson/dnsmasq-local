@@ -3,38 +3,31 @@
 require_relative '../spec_helper'
 
 describe 'dnsmasq-local::default' do
+  let(:config) { nil }
   let(:platform) { { platform: 'ubuntu', version: '14.04' } }
-  let(:runner) { ChefSpec::SoloRunner.new(platform) }
+  let(:runner) do
+    ChefSpec::SoloRunner.new(platform) do |node|
+      node.set['dnsmasq_local']['config'] = config unless config.nil?
+    end
+  end
   let(:chef_run) { runner.converge(described_recipe) }
 
-  it 'creates the dnsmasq.d directory' do
-    expect(chef_run).to create_directory('/etc/dnsmasq.d')
+  shared_examples_for 'any attribute set' do
+    it 'creates a dnsmasq_local resource' do
+      expect(chef_run).to create_dnsmasq_local('default')
+        .with(config: config || {})
+    end
   end
 
-  it 'creates the dns.conf file' do
-    expected = <<-EOH.gsub(/^ {6}/, '').strip
-      interface=
-      cache-size=0
-      no-hosts
-      bind-interfaces
-      proxy-dnssec
-      query-port=0
-    EOH
-    expect(chef_run).to create_file('/etc/dnsmasq.d/dns.conf')
-      .with_content(expected)
-    expect(chef_run.file('/etc/dnsmasq.d/dns.conf'))
-      .to notify('service[dnsmasq]').to(:restart)
+  context 'default attributes' do
+    let(:config) { nil }
+
+    it_behaves_like 'any attribute set'
   end
 
-  it 'installs dnsmasq' do
-    expect(chef_run).to install_package('dnsmasq')
-  end
+  context 'an overridden config attribute' do
+    let(:config) { { 'cache-size' => 10, 'no-hosts' => false } }
 
-  it 'enables the dnsmasq service' do
-    expect(chef_run).to enable_service('dnsmasq')
-  end
-
-  it 'starts the dnsmasq service' do
-    expect(chef_run).to start_service('dnsmasq')
+    it_behaves_like 'any attribute set'
   end
 end
