@@ -4,10 +4,10 @@
 directory '/var/lib/resolvconf'
 file '/var/lib/resolvconf/linkified'
 
-%w(apt-utils resolvconf dnsutils).each { |p| package p }
+%w(apt-utils resolvconf).each { |p| package p }
 
 service 'resolvconf' do
-  status_command 'service resolvconf status'
+  status_command 'service resolvconf status | grep enabled'
   start_command 'service resolvconf start'
   action :start
 end
