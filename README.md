@@ -68,7 +68,7 @@ Actions:
 
 | Action    | Description                                  |
 |-----------|----------------------------------------------|
-| `:create` | Install, configure, and enaile+start Dnsmasq |
+| `:create` | Install, configure, and enable+start Dnsmasq |
 | `:remove` | Stop+disable and remove Dnsmasq              |
 
 Attributes:
