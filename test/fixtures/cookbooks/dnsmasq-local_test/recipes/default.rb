@@ -7,9 +7,7 @@ file '/var/lib/resolvconf/linkified'
 %w(apt-utils resolvconf).each { |p| package p }
 
 service 'resolvconf' do
-  status_command 'service resolvconf status | grep enabled'
-  start_command 'service resolvconf start'
-  action :start
+  action %i(enable start)
 end
 
 include_recipe 'dnsmasq-local'
