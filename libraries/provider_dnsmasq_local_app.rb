@@ -18,6 +18,7 @@
 # limitations under the License.
 #
 
+require 'chef/dsl/include_recipe'
 require 'chef/provider/lwrp_base'
 
 class Chef
@@ -26,6 +27,8 @@ class Chef
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
     class DnsmasqLocalApp < LWRPBase
+      include Chef::DSL::IncludeRecipe
+
       use_inline_resources
 
       provides :dnsmasq_local_app if defined?(provides)
@@ -43,6 +46,7 @@ class Chef
       # Install the Dnsmasq package.
       #
       action :install do
+        include_recipe 'apt'
         package 'dnsmasq'
       end
 
