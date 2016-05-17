@@ -16,6 +16,8 @@ if respond_to?(:issues_url)
   issues_url 'https://github.com/socrata-cookbooks/dnsmasq-local/issues'
 end
 
-conflicts 'dnsmasq'
-
 supports 'ubuntu'
+
+depends 'apt'
+
+conflicts 'dnsmasq'

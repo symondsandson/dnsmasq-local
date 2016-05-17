@@ -28,9 +28,11 @@ platforms:
         - RUN ln -sf /sbin/initctl.distrib /sbin/initctl
   - name: ubuntu-14.04-chef-11
     driver:
-      image: ubuntu:14.04
-      pid_one_command: /sbin/init
-      intermediate_instructions:
-        - RUN dpkg-divert --remove /sbin/initctl
-        - RUN ln -sf /sbin/initctl.distrib /sbin/initctl
-      chef_version: 11.16.4
+      name: docker
+    transport:
+      name: ssh
+    provisioner:
+      name: chef_zero
+      require_chef_omnibus: 11.16.4
+    verifier:
+      root_path: /tmp/kitchen

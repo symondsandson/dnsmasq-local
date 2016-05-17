@@ -15,6 +15,10 @@ describe 'resource_dnsmasq_local_app::ubuntu::14_04' do
     let(:action) { :default }
     cached(:chef_run) { converge }
 
+    it 'ensures the APT cache is up to date' do
+      expect(chef_run).to include_recipe('apt')
+    end
+
     it 'installs the Dnsmasq package' do
       expect(chef_run).to install_package('dnsmasq')
     end

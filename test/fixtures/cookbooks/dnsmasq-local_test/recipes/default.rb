@@ -4,10 +4,11 @@
 directory '/var/lib/resolvconf'
 file '/var/lib/resolvconf/linkified'
 
+include_recipe 'apt'
 %w(apt-utils resolvconf).each { |p| package p }
 
 service 'resolvconf' do
-  action %i(enable start)
+  action [:enable, :start]
 end
 
 include_recipe 'dnsmasq-local'
