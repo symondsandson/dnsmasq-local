@@ -45,8 +45,11 @@ class Chef
       #
       action :create do
         directory '/etc/dnsmasq.d'
+        merged_config = new_resource.config.merge(
+          new_resource.state.select { |k, _| k != :config }
+        )
         file '/etc/dnsmasq.d/dns.conf' do
-          content config_body_for(new_resource.config)
+          content config_body_for(merged_config)
         end
       end
 

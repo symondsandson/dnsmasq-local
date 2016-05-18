@@ -67,7 +67,8 @@ class Chef
       #
       def method_missing(method_symbol, *args, &block)
         if block.nil? && args.length == 1
-          config[method_symbol] = args[0]
+          self.class.attribute method_symbol, kind_of: args[0].class
+          send(method_symbol, args[0]) unless args[0].nil?
         else
           super
         end

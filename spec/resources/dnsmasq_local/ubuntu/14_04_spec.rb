@@ -16,14 +16,18 @@ describe 'resource_dnsmasq_local::ubuntu::14_04' do
 
     shared_examples_for 'any attribute set' do
       it 'creates the dnsmasq_local_config' do
-        expected = { interface: '',
-                     cache_size: 0,
-                     no_hosts: true,
-                     bind_interfaces: true,
-                     proxy_dnssec: true,
-                     query_port: 0 }.merge(config.to_h).sort.to_h
+        expected = {
+          config: {
+            interface: '',
+            cache_size: 0,
+            no_hosts: true,
+            bind_interfaces: true,
+            proxy_dnssec: true,
+            query_port: 0
+          }
+        }.merge(config.to_h)
         expect(chef_run).to create_dnsmasq_local_config('default')
-          .with(config: expected)
+          .with(expected)
         expect(chef_run.dnsmasq_local_config('default'))
           .to notify('dnsmasq_local_service[default]').to(:restart)
       end
