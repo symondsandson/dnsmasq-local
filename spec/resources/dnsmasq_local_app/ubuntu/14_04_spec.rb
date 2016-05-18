@@ -1,18 +1,25 @@
 require_relative '../../../spec_helper'
 
 describe 'resource_dnsmasq_local_app::ubuntu::14_04' do
-  let(:config) { nil }
+  let(:name) { 'default' }
+  let(:action) { nil }
   let(:runner) do
-    ChefSpec::SoloRunner.new(step_into: 'dnsmasq_local_app',
-                             platform: 'ubuntu',
-                             version: '14.04')
+    ChefSpec::SoloRunner.new(
+      step_into: 'dnsmasq_local_app', platform: 'ubuntu', version: '14.04'
+    ) do |node|
+      %i(name action).each do |p|
+        unless send(p).nil?
+          node.set['resource_dnsmasq_local_app_test'][p] = send(p)
+        end
+      end
+    end
   end
   let(:converge) do
-    runner.converge("resource_dnsmasq_local_app_test::#{action}")
+    runner.converge('resource_dnsmasq_local_app_test')
   end
 
   context 'the default action (:install)' do
-    let(:action) { :default }
+    let(:action) { nil }
     cached(:chef_run) { converge }
 
     it 'ensures the APT cache is up to date' do
