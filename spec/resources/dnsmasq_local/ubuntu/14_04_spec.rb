@@ -1,29 +1,36 @@
 require_relative '../../../spec_helper'
 
 describe 'resource_dnsmasq_local::ubuntu::14_04' do
-  let(:config) { nil }
+  let(:name) { 'default' }
+  %i(config action).each { |p| let(p) { nil } }
   let(:runner) do
     ChefSpec::SoloRunner.new(
       step_into: 'dnsmasq_local', platform: 'ubuntu', version: '14.04'
     ) do |node|
-      node.set['dnsmasq_local']['config'] = config unless config.nil?
+      %i(name config action).each do |p|
+        node.set['resource_dnsmasq_local_test'][p] = send(p) unless send(p).nil?
+      end
     end
   end
-  let(:converge) { runner.converge("resource_dnsmasq_local_test::#{action}") }
+  let(:converge) { runner.converge('resource_dnsmasq_local_test') }
 
   context 'the default action (:create)' do
-    let(:action) { :default }
+    let(:action) { nil }
 
     shared_examples_for 'any attribute set' do
       it 'creates the dnsmasq_local_config' do
-        expected = { interface: '',
-                     cache_size: 0,
-                     no_hosts: true,
-                     bind_interfaces: true,
-                     proxy_dnssec: true,
-                     query_port: 0 }.merge(config.to_h).sort.to_h
+        expected = {
+          config: {
+            interface: '',
+            cache_size: 0,
+            no_hosts: true,
+            bind_interfaces: true,
+            proxy_dnssec: true,
+            query_port: 0
+          }
+        }.merge(config.to_h)
         expect(chef_run).to create_dnsmasq_local_config('default')
-          .with(config: expected)
+          .with(expected)
         expect(chef_run.dnsmasq_local_config('default'))
           .to notify('dnsmasq_local_service[default]').to(:restart)
       end

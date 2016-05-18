@@ -1,5 +1,8 @@
 # Encoding: UTF-8
 
-dnsmasq_local 'default' do
-  config node['dnsmasq_local']['config']
+attrs = node['resource_dnsmasq_local_test']
+
+dnsmasq_local attrs['name'] do
+  config attrs['config'] unless attrs['config'].nil?
+  action attrs['action'] unless attrs['action'].nil?
 end

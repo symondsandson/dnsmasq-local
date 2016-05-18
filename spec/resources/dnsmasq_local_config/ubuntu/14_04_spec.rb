@@ -1,26 +1,25 @@
 require_relative '../../../spec_helper'
 
 describe 'resource_dnsmasq_local_config::ubuntu::14_04' do
+  let(:name) { 'default' }
+  %i(config properties action).each { |p| let(p) { nil } }
   let(:override_config) { nil }
   let(:merge_configs) { nil }
   let(:runner) do
     ChefSpec::SoloRunner.new(
       step_into: 'dnsmasq_local_config', platform: 'ubuntu', version: '14.04'
     ) do |node|
-      unless override_config.nil?
-        node.set['dnsmasq_local']['override_config'] = override_config
-      end
-      unless merge_configs.nil?
-        node.set['dnsmasq_local']['merge_configs'] = merge_configs
+      %i(name config properties action).each do |p|
+        unless send(p).nil?
+          node.set['resource_dnsmasq_local_config_test'][p] = send(p)
+        end
       end
     end
   end
-  let(:converge) do
-    runner.converge("resource_dnsmasq_local_config_test::#{action}")
-  end
+  let(:converge) { runner.converge('resource_dnsmasq_local_config_test') }
 
   context 'the default action (:create)' do
-    let(:action) { :default }
+    let(:action) { nil }
 
     shared_examples_for 'any attributes' do
       it 'creates the dnsmasq.d directory' do
@@ -29,8 +28,8 @@ describe 'resource_dnsmasq_local_config::ubuntu::14_04' do
     end
 
     context 'the default attributes' do
-      let(:override_config) { nil }
-      let(:merge_configs) { nil }
+      let(:config) { nil }
+      let(:properties) { nil }
       cached(:chef_run) { converge }
 
       it_behaves_like 'any attributes'
@@ -50,7 +49,7 @@ describe 'resource_dnsmasq_local_config::ubuntu::14_04' do
     end
 
     context 'a default config override' do
-      let(:override_config) do
+      let(:config) do
         {
           interface: 'docker0',
           no_hosts: false,
@@ -59,7 +58,7 @@ describe 'resource_dnsmasq_local_config::ubuntu::14_04' do
           other_bool: false
         }
       end
-      let(:merge_configs) { nil }
+      let(:properties) { nil }
       cached(:chef_run) { converge }
 
       it_behaves_like 'any attributes'
@@ -76,8 +75,8 @@ describe 'resource_dnsmasq_local_config::ubuntu::14_04' do
     end
 
     context 'some extra configs to merge in with the default' do
-      let(:override_config) { nil }
-      let(:merge_configs) do
+      let(:config) { nil }
+      let(:properties) do
         {
           interface: 'docker0',
           no_hosts: false,
@@ -106,8 +105,8 @@ describe 'resource_dnsmasq_local_config::ubuntu::14_04' do
     end
 
     context 'an invalid config attribute' do
-      let(:override_config) { { example: :bad } }
-      let(:merge_configs) { nil }
+      let(:config) { { example: :bad } }
+      let(:properties) { nil }
       cached(:chef_run) { converge }
 
       it 'raises an error' do

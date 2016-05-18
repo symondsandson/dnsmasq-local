@@ -1,9 +1,9 @@
 # Encoding: UTF-8
 
-override_config = node['dnsmasq_local']['override_config']
-merge_configs = node['dnsmasq_local']['merge_configs']
+attrs = node['resource_dnsmasq_local_config_test']
 
-dnsmasq_local_config 'default' do
-  config override_config unless override_config.nil?
-  merge_configs.to_h.each { |k, v| send(k, v) }
+dnsmasq_local_config attrs['name'] do
+  config attrs['config'] unless attrs['config'].nil?
+  attrs['properties'].to_h.each { |k, v| send(k, v) }
+  action attrs['action'] unless attrs['action'].nil?
 end
