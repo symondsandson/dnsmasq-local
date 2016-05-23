@@ -4,6 +4,7 @@ Dnsmasq Local Cookbook CHANGELOG
 Unreleased
 ----------
 - Fix custom config properties/attributes under Chef 11
+- Support arrays for config attributes with >1 value (e.g. "server")
 
 v0.2.0 (2016-05-18)
 -------------------

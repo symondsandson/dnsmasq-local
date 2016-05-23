@@ -16,8 +16,9 @@ describe 'dnsmasq-local::custom::config' do
       expect(subject.content).to match(/^query-port=0$/)
     end
 
-    it 'is pointed at a Google nameserver' do
+    it 'is pointed at Google nameservers' do
       expect(subject.content).to match(/^server=8\.8\.8\.8$/)
+      expect(subject.content).to match(/^server=8\.8\.4\.4$/)
     end
 
     it 'has a custom DNS entry for example.biz' do

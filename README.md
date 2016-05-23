@@ -110,6 +110,7 @@ Syntax:
     dnsmasq_local_config 'default' do
         config { cache_size: 100 }
         no_hosts false
+        server %w(8.8.8.8 8.8.4.4)
         action :create
     end
 
@@ -139,7 +140,8 @@ Attributes:
   it.
 
 \*\* Any unrecognized attribute that is passed in will be assumed to be a
-  correct Dnsmasq setting and rendered out to its config.
+  correct Dnsmasq setting and rendered out to its config. These attributes'
+values can be `true`, `false`, integers, strings, or arrays.
 
 ***dnsmasq_local_service***
 

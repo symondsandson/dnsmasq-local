@@ -25,5 +25,7 @@ suites:
       dnsmasq_local:
         config:
           cache_size: 64
-          server: 8.8.8.8
+          server:
+            - 8.8.8.8
+            - 8.8.4.4
           address: /example.biz/127.0.0.1

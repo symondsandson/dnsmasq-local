@@ -25,7 +25,7 @@ class Chef
     # A Chef resource for generating Dnsmasq configs.
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
-    class DnsmasqLocalConfig < LWRPBase
+    class DnsmasqLocalConfig < LWRPBase # rubocop:disable Style/Documentation
       self.resource_name = :dnsmasq_local_config
 
       actions :create, :remove
@@ -91,4 +91,6 @@ class Chef
       end
     end
   end
-end
+end unless defined?(Chef::Resource::DnsmasqLocalConfig)
+# Don't let this class be reloaded or strange things happen to the custom
+# properties we've loaded in via `method_missing`.
