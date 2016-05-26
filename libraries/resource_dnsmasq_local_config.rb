@@ -25,10 +25,13 @@ class Chef
     # A Chef resource for generating Dnsmasq configs.
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
-    class DnsmasqLocalConfig < LWRPBase
+    class DnsmasqLocalConfig < LWRPBase # rubocop:disable Style/Documentation
       self.resource_name = :dnsmasq_local_config
+
       actions :create, :remove
       default_action :create
+
+      state_attrs :config
 
       #
       # Set up a default config attribute hash that can overridden in its
@@ -68,11 +71,26 @@ class Chef
       def method_missing(method_symbol, *args, &block)
         if block.nil? && args.length == 1
           self.class.attribute method_symbol, kind_of: args[0].class
+          add_state_attr(method_symbol)
           send(method_symbol, args[0]) unless args[0].nil?
         else
           super
         end
       end
+
+      #
+      # Add a newly-declared attribute into the list of desired state
+      # attributes to account for the fact that Chef 12 defaults this to true
+      # while 11 defaults it to false.
+      #
+      # @param attr [Symbol] the new attribute to add to the list of state ones
+      #
+      def add_state_attr(attr)
+        new_attrs = (self.class.state_attrs << attr).uniq
+        self.class.state_attrs(*new_attrs)
+      end
     end
   end
-end
+end unless defined?(Chef::Resource::DnsmasqLocalConfig)
+# Don't let this class be reloaded or strange things happen to the custom
+# properties we've loaded in via `method_missing`.

@@ -18,4 +18,14 @@ suites:
   - name: default
     run_list:
       - recipe[dnsmasq-local_test]
+  - name: custom
+    run_list:
+      - recipe[dnsmasq-local_test]
     attributes:
+      dnsmasq_local:
+        config:
+          cache_size: 64
+          server:
+            - 8.8.8.8
+            - 8.8.4.4
+          address: /example.biz/127.0.0.1

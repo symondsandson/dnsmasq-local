@@ -46,7 +46,7 @@ class Chef
       action :create do
         directory '/etc/dnsmasq.d'
         merged_config = new_resource.config.merge(
-          new_resource.state.select { |k, _| k != :config }
+          new_resource.state.select { |k, v| k != :config && !v.nil? }
         )
         file '/etc/dnsmasq.d/dns.conf' do
           content config_body_for(merged_config)
@@ -71,16 +71,30 @@ class Chef
       # @return [String] a config file body
       #
       def config_body_for(config)
-        Hash[config.sort].map do |k, v|
-          case v
-          when TrueClass, FalseClass
-            k.to_s.tr('_', '-') if v
-          when String, Fixnum
-            "#{k.to_s.tr('_', '-')}=#{v}"
-          else
-            raise(Exceptions::ValidationFailed, "Invalid: '#{k}' => '#{v}'")
-          end
-        end.compact.join("\n")
+        Hash[config.sort].map { |k, v| config_for(k, v) }.compact.join("\n")
+      end
+
+      #
+      # Take a config key and value and return the dnsmasq.conf-compatible
+      # string representation of them.
+      #
+      # @param key [Symbol, String] the dnsmasq config key
+      # @param val [TrueClass, FalseClass, String, Fixnum, Array] the value(s)
+      #
+      # @return [String, NilClass] the rendered config string or nil for an
+      #                            empty one
+      #
+      def config_for(key, val)
+        case val
+        when TrueClass, FalseClass
+          key.to_s.tr('_', '-') if val
+        when String, Fixnum
+          "#{key.to_s.tr('_', '-')}=#{val}"
+        when Array
+          val.map { |v| config_for(key, v) }.join("\n")
+        else
+          raise(Exceptions::ValidationFailed, "Invalid: '#{key}' => '#{val}'")
+        end
       end
     end
   end

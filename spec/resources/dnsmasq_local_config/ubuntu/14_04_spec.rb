@@ -81,6 +81,7 @@ describe 'resource_dnsmasq_local_config::ubuntu::14_04' do
           interface: 'docker0',
           no_hosts: false,
           example: 'elpmaxe',
+          server: %w(8.8.8.8 8.8.4.4),
           bool: true,
           other_bool: false
         }
@@ -98,6 +99,8 @@ describe 'resource_dnsmasq_local_config::ubuntu::14_04' do
           interface=docker0
           proxy-dnssec
           query-port=0
+          server=8.8.8.8
+          server=8.8.4.4
         EOH
         expect(chef_run).to create_file('/etc/dnsmasq.d/dns.conf')
           .with(content: expected)
