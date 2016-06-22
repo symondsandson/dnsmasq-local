@@ -1,6 +1,6 @@
 # Encoding: UTF-8
 
-name 'resource_dnsmasq_local_test'
+name 'dnsmasq_local_resource_test'
 maintainer 'Jonathan Hartman'
 maintainer_email 'jonathan.hartman@socrata.com'
 license 'apache2'
