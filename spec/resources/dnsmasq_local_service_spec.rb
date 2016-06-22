@@ -28,10 +28,14 @@ describe 'dnsmasq_local_service' do
         cached(:chef_run) { converge }
 
         it 'generates the expected defaults file' do
-          expect(chef_run).to create_file('/etc/default/dnsmasq').with(
-            content: "CONFIG_DIR='/etc/dnsmasq.d,.dpkg-dist,.dpkg-old," \
-                     ".dpkg-new'\nENABLED='1'"
-          )
+          expected = <<-EOH.gsub(/^ {12}/, '').strip
+            # This file is managed by Chef.
+            # Any changes to it will be overwritten.
+            CONFIG_DIR='/etc/dnsmasq.d,.dpkg-dist,.dpkg-old,.dpkg-new'
+            ENABLED='1'
+          EOH
+          expect(chef_run).to create_file('/etc/default/dnsmasq')
+            .with(content: expected)
         end
 
         it 'enables the dnsmasq service' do
@@ -65,6 +69,8 @@ describe 'dnsmasq_local_service' do
 
           it 'creates the defaults file' do
             expected = <<-EOH.gsub(/^ {14}/, '').strip
+              # This file is managed by Chef.
+              # Any changes to it will be overwritten.
               CONFIG_DIR='/etc/dnsmasq.d,.dpkg-dist,.dpkg-old,.dpkg-new'
               ENABLED='1'
             EOH
@@ -79,9 +85,14 @@ describe 'dnsmasq_local_service' do
           cached(:chef_run) { converge }
 
           it 'generates the expected defaults file' do
-            expect(chef_run).to create_file('/etc/default/dnsmasq').with(
-              content: "ENABLED='0'\nTESTING='yes'"
-            )
+            expected = <<-EOH.gsub(/^ {14}/, '').strip
+              # This file is managed by Chef.
+              # Any changes to it will be overwritten.
+              ENABLED='0'
+              TESTING='yes'
+            EOH
+            expect(chef_run).to create_file('/etc/default/dnsmasq')
+              .with(content: expected)
           end
         end
 
@@ -92,6 +103,8 @@ describe 'dnsmasq_local_service' do
 
           it 'generates the expected defaults file' do
             expected = <<-EOH.gsub(/^ {14}/, '').strip
+              # This file is managed by Chef.
+              # Any changes to it will be overwritten.
               CONFIG_DIR='/etc/dnsmasq.d,.dpkg-dist,.dpkg-old,.dpkg-new'
               DNSMASQ_OPTS='--bind-dynamic'
               ENABLED='1'

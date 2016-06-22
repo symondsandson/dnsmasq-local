@@ -71,7 +71,12 @@ class Chef
       # @return [String] a config file body
       #
       def config_body_for(config)
-        Hash[config.sort].map { |k, v| config_for(k, v) }.compact.join("\n")
+        res = <<-EOH.gsub(/^ +/, '')
+          # This file is managed by Chef.
+          # Any changes to it will be overwritten.
+        EOH
+        res << Hash[config.sort].map { |k, v| config_for(k, v) }.compact
+               .join("\n")
       end
 
       #

@@ -7,7 +7,7 @@ describe 'dnsmasq-local::default::service' do
     it 'contains the expected environment variables' do
       expected = <<-EOH.gsub(/^ +/, '').strip
         # This file is managed by Chef.
-        # Any changes will be overwritten.
+        # Any changes to it will be overwritten.
         CONFIG_DIR='/etc/dnsmasq.d,.dpkg-dist,.dpkg-old,.dpkg-new'
         ENABLED='1'
       EOH

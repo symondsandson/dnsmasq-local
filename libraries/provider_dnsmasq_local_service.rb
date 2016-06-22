@@ -48,8 +48,12 @@ class Chef
           new_resource.state.select { |k, v| k != :environment && !v.nil? }
         )
         file '/etc/default/dnsmasq' do
-          c = Hash[merged_env.sort].map { |k, v| "#{k.upcase}='#{v}'" }
-                                   .join("\n")
+          c = <<-EOH.gsub(/^ +/, '')
+            # This file is managed by Chef.
+            # Any changes to it will be overwritten.
+          EOH
+          c << Hash[merged_env.sort].map { |k, v| "#{k.upcase}='#{v}'" }
+               .join("\n")
           content c
         end
       end

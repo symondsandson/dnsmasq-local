@@ -43,6 +43,8 @@ describe 'dnsmasq_local_config' do
 
           it 'generates the expected config' do
             expected = <<-EOH.gsub(/^ {14}/, '').strip
+              # This file is managed by Chef.
+              # Any changes to it will be overwritten.
               bind-interfaces
               cache-size=0
               interface=
@@ -72,6 +74,8 @@ describe 'dnsmasq_local_config' do
 
           it 'generates the expected config' do
             expected = <<-EOH.gsub(/^ {14}/, '').strip
+              # This file is managed by Chef.
+              # Any changes to it will be overwritten.
               bool
               example=elpmaxe
               interface=docker0
@@ -99,6 +103,8 @@ describe 'dnsmasq_local_config' do
 
           it 'generates the expected config' do
             expected = <<-EOH.gsub(/^ {14}/, '').strip
+              # This file is managed by Chef.
+              # Any changes to it will be overwritten.
               bind-interfaces
               bool
               cache-size=0
