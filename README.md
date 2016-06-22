@@ -50,6 +50,12 @@ attributes with an underscore (e.g. `cache_size`).
 Any Dnsmasq setting that is a boolean key with no value (e.g. `proxy_dnssec`)
 can be set to true or false to be enabled or disabled, respectively.
 
+    default['dnsmasq_local']['config'] = {}
+
+Any key+value can be set under this namespace and it will be merged into the
+default Dnsmasq environment variables. Keys will be automatically upcased
+before being rendered into the final service config.
+
 Resources
 =========
 
@@ -60,8 +66,9 @@ A parent resource that combines an app + config + service resource.
 Syntax:
 
     dnsmasq_local 'default' do
-        config ({ cache_size: 0 })
-        action :create
+      config ({ cache_size: 0 })
+      environment { dnsmasq_opts: '--bind-dynamic' }
+      action :create
     end
 
 Actions:
@@ -73,10 +80,11 @@ Actions:
 
 Attributes:
 
-| Attribute | Default    | Description                         |
-|-----------|------------|-------------------------------------|
-| config    | `nil`      | A Dnsmasq configuration hash        |
-| action    | `:create`  | Action(s) to perform                |
+| Attribute   | Default    | Description                         |
+|-------------|------------|-------------------------------------|
+| config      | `nil`      | A Dnsmasq configuration hash        |
+| environment | `nil`      | A Dnsmasq environment variable hash |
+| action      | `:create`  | Action(s) to perform                |
 
 ***dnsmasq_local_app***
 
@@ -85,7 +93,7 @@ A resource for installation and removal of the Dnsmasq app packages.
 Syntax:
 
     dnsmasq_local_app 'default' do
-        action :install
+      action :install
     end
 
 Actions:
@@ -108,10 +116,10 @@ A resource for generating Dnsmasq configurations.
 Syntax:
 
     dnsmasq_local_config 'default' do
-        config ({ cache_size: 100 })
-        no_hosts false
-        server %w(8.8.8.8 8.8.4.4)
-        action :create
+      config ({ cache_size: 100 })
+      no_hosts false
+      server %w(8.8.8.8 8.8.4.4)
+      action :create
     end
 
 Actions:
@@ -150,7 +158,9 @@ A resource for the managing the Dnsmasq service.
 Syntax:
 
     dnsmasq_local_service 'default' do
-        action [:enable, :start]
+      environment { config_dir: '/tmp/dnsmasq' }
+      dnsmasq_opts '--bind-dynamic'
+      action [:enable, :start]
     end
 
 Actions:
@@ -165,9 +175,21 @@ Actions:
 
 Attributes:
 
-| Attribute | Default             | Description          |
-|-----------|---------------------|----------------------|
-| action    | `[:enable, :start]` | Action(s) to perform |
+| Attribute   | Default               | Description                    |
+|-------------|-----------------------|--------------------------------|
+| environment | See below             | A complete environment hash \* |
+| config_dir  | `'/etc/dnsmasq.d...'` | Point at Dnsmasq's .d dir      |
+| enabled     | 1                     | Enable Dnsmasq                 |
+| \*\*        | `nil`                 | Varies                         |
+| action      | `[:enable, :start]`   | Action(s) to perform           |
+
+\* An environment attribute that is passed in will override the entirety of the
+  default environment, whereas individual attributes passed in will be merged
+  with it.
+
+\*\* Any unrecognized attribute that is passed in will be assumed to be a
+     valid Dnsmasq environment variable and rendered out to its service
+     definition.
 
 Providers
 =========

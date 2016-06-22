@@ -8,6 +8,10 @@ describe 'dnsmasq-local::default::config' do
       expect(subject.content).to match(/^interface=$/)
     end
 
+    it 'has bind-interfaces set' do
+      expect(subject.content).to match(/^bind-interfaces$/)
+    end
+
     it 'is not caching lookup results' do
       expect(subject.content).to match(/^cache-size=0$/)
     end

@@ -23,7 +23,9 @@ if defined?(ChefSpec)
     dnsmasq_local: [:create, :remove],
     dnsmasq_local_app: [:install, :remove],
     dnsmasq_local_config: [:create, :remove],
-    dnsmasq_local_service: [:enable, :disable, :stop, :start, :restart]
+    dnsmasq_local_service: [
+      :create, :remove, :enable, :disable, :stop, :start, :restart
+    ]
   }.each do |matcher, actions|
     ChefSpec.define_matcher(matcher)
 
