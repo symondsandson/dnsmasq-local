@@ -46,7 +46,6 @@ class Chef
       # Install the Dnsmasq package.
       #
       action :install do
-        include_recipe 'apt'
         package 'dnsmasq'
       end
 

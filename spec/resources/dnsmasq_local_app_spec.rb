@@ -27,10 +27,6 @@ describe 'dnsmasq_local_app' do
         let(:platform_version) { '16.04' }
         cached(:chef_run) { converge }
 
-        it 'ensures the APT cache is up to date' do
-          expect(chef_run).to include_recipe('apt')
-        end
-
         it 'installs the Dnsmasq package' do
           expect(chef_run).to install_package('dnsmasq')
         end

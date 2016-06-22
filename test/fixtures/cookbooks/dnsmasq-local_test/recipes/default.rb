@@ -4,7 +4,7 @@
 directory '/var/lib/resolvconf'
 file '/var/lib/resolvconf/linkified'
 
-include_recipe 'apt'
+execute 'apt-get update'
 %w(apt-utils resolvconf).each { |p| package p }
 
 service 'resolvconf' do

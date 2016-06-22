@@ -9,4 +9,3 @@ long_description 'dnsmasq-local_test'
 version '0.0.1'
 
 depends 'dnsmasq-local'
-depends 'apt'
