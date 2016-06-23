@@ -60,7 +60,7 @@ A parent resource that combines an app + config + service resource.
 Syntax:
 
     dnsmasq_local 'default' do
-        config { cache_size: 0 }
+        config ({ cache_size: 0 })
         action :create
     end
 
@@ -108,7 +108,7 @@ A resource for generating Dnsmasq configurations.
 Syntax:
 
     dnsmasq_local_config 'default' do
-        config { cache_size: 100 }
+        config ({ cache_size: 100 })
         no_hosts false
         server %w(8.8.8.8 8.8.4.4)
         action :create
