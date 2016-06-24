@@ -3,6 +3,8 @@ Dnsmasq Local Cookbook CHANGELOG
 
 Unreleased
 ----------
+- Take over management of the Dnsmasq environment variables
+- Add a warning comment to all Chef-managed config files
 
 v0.3.0 (2016-05-26)
 -------------------

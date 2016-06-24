@@ -34,6 +34,11 @@ class Chef
       # Support passing a dnsmasq config in as one big (or small) hash.
       #
       attribute :config, kind_of: Hash, default: {}
+
+      #
+      # Supporting passing dnsmasq environment variables as a hash.
+      #
+      attribute :environment, kind_of: Hash, default: {}
     end
   end
 end

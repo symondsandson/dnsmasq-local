@@ -24,8 +24,11 @@ suites:
     attributes:
       dnsmasq_local:
         config:
+          bind_interfaces: false
           cache_size: 64
           server:
             - 8.8.8.8
             - 8.8.4.4
           address: /example.biz/127.0.0.1
+        environment:
+          dnsmasq_opts: '--bind-dynamic'

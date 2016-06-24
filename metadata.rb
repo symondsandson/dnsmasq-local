@@ -18,6 +18,4 @@ end
 
 supports 'ubuntu'
 
-depends 'apt'
-
 conflicts 'dnsmasq'

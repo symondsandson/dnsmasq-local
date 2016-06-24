@@ -41,9 +41,36 @@ class Chef
       end
 
       #
-      # Pass whatever action was called on to a standard Chef service resource.
+      # Generate the `/etc/default/dnsmasq` file for the service.
+      #
+      action :create do
+        merged_env = new_resource.environment.merge(
+          new_resource.state.select { |k, v| k != :environment && !v.nil? }
+        )
+        file '/etc/default/dnsmasq' do
+          c = <<-EOH.gsub(/^ +/, '')
+            # This file is managed by Chef.
+            # Any changes to it will be overwritten.
+          EOH
+          c << Hash[merged_env.sort].map { |k, v| "#{k.upcase}='#{v}'" }
+               .join("\n")
+          content c
+        end
+      end
+
+      #
+      # Clean up the service files that are managed by Chef.
+      #
+      action :remove do
+        file('/etc/default/dnsmasq') { action :delete }
+      end
+
+      #
+      # Every action that isn't :create or :remove should be passed on to a
+      # standard Chef service resource.
       #
       Resource::DnsmasqLocalService.new('_', nil).allowed_actions.each do |a|
+        next if [:create, :remove].include?(a)
         action(a) do
           service "#{a} dnsmasq" do
             service_name 'dnsmasq'

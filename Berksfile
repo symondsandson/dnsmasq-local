@@ -5,14 +5,8 @@ source 'https://supermarket.chef.io'
 metadata
 
 group :unit do
-  cookbook 'resource_dnsmasq_local_test',
-           path: 'spec/support/cookbooks/resource_dnsmasq_local_test'
-  cookbook 'resource_dnsmasq_local_app_test',
-           path: 'spec/support/cookbooks/resource_dnsmasq_local_app_test'
-  cookbook 'resource_dnsmasq_local_config_test',
-           path: 'spec/support/cookbooks/resource_dnsmasq_local_config_test'
-  cookbook 'resource_dnsmasq_local_service_test',
-           path: 'spec/support/cookbooks/resource_dnsmasq_local_service_test'
+  cookbook 'dnsmasq_local_resource_test',
+           path: 'spec/support/cookbooks/dnsmasq_local_resource_test'
 end
 
 group :integration do
