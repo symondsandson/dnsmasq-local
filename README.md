@@ -205,15 +205,23 @@ Provider that wraps each of the Dnsmasq component resources.
 
 ***Chef::Provider::DnsmasqLocalApp***
 
-Provider for managing the Dnsmasq app packages.
+Parent provider for managing Dnsmasq app packages.
+
+***Chef::Provider::DnsmasqLocalAppDebian***
+
+The Ubuntu/Debian implementation of the app provider.
+
+***Chef::Provider::DnsmasqLocalConfig***
+
+Platform-agnostic provider for managing Dnsmasq config files.
 
 ***Chef::Provider::DnsmasqLocalService***
 
-Provider for managing Dnsmasq config files.
+Parent provider for managing the Dnsmasq service.
 
-***Chef::Provider::DnsmasqLocalService***
+***Chef::Provider::DnsmasqLocalServiceDebian***
 
-Provider for managing the Dnsmasq service.
+The Ubuntu/Debian implementation of the service provider.
 
 Contributing
 ============

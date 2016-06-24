@@ -29,8 +29,6 @@ class Chef
     class DnsmasqLocalService < LWRPBase
       use_inline_resources
 
-      provides :dnsmasq_local_service if defined?(provides)
-
       #
       # WhyRun is supported by this provider
       #
@@ -38,31 +36,6 @@ class Chef
       #
       def whyrun_supported?
         true
-      end
-
-      #
-      # Generate the `/etc/default/dnsmasq` file for the service.
-      #
-      action :create do
-        merged_env = new_resource.environment.merge(
-          new_resource.state.select { |k, v| k != :environment && !v.nil? }
-        )
-        file '/etc/default/dnsmasq' do
-          c = <<-EOH.gsub(/^ +/, '')
-            # This file is managed by Chef.
-            # Any changes to it will be overwritten.
-          EOH
-          c << Hash[merged_env.sort].map { |k, v| "#{k.upcase}='#{v}'" }
-               .join("\n")
-          content c
-        end
-      end
-
-      #
-      # Clean up the service files that are managed by Chef.
-      #
-      action :remove do
-        file('/etc/default/dnsmasq') { action :delete }
       end
 
       #

@@ -21,17 +21,19 @@
 require 'chef/version'
 require 'chef/platform/provider_mapping'
 require_relative 'provider_dnsmasq_local'
-require_relative 'provider_dnsmasq_local_app'
+require_relative 'provider_dnsmasq_local_app_debian'
 require_relative 'provider_dnsmasq_local_config'
-require_relative 'provider_dnsmasq_local_service'
+require_relative 'provider_dnsmasq_local_service_debian'
 
 if Gem::Version.new(Chef::VERSION) < Gem::Version.new('12')
   Chef::Platform.set(resource: :dnsmasq_local,
                      provider: Chef::Provider::DnsmasqLocal)
   Chef::Platform.set(resource: :dnsmasq_local_app,
-                     provider: Chef::Provider::DnsmasqLocalApp)
+                     platform_family: 'debian',
+                     provider: Chef::Provider::DnsmasqLocalApp::Debian)
   Chef::Platform.set(resource: :dnsmasq_local_config,
                      provider: Chef::Provider::DnsmasqLocalConfig)
   Chef::Platform.set(resource: :dnsmasq_local_service,
-                     provider: Chef::Provider::DnsmasqLocalService)
+                     platform_family: 'debian',
+                     provider: Chef::Provider::DnsmasqLocalService::Debian)
 end

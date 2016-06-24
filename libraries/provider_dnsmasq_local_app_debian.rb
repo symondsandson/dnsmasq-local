@@ -1,7 +1,7 @@
 # Encoding: UTF-8
 #
 # Cookbook Name:: dnsmasq-local
-# Library:: provider_dnsmasq_local_app
+# Library:: provider_dnsmasq_local_app_debian
 #
 # Copyright 2016, Socrata, Inc.
 #
@@ -18,30 +18,23 @@
 # limitations under the License.
 #
 
-require 'chef/provider/lwrp_base'
+require_relative 'provider_dnsmasq_local_app'
 
 class Chef
   class Provider
-    # A Chef provider for managing the Dnsmasq package.
+    # A Dnsmasq package provider specific to Debian platforms.
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
-    class DnsmasqLocalApp < LWRPBase
-      use_inline_resources
-
-      #
-      # WhyRun is supported by this provider
-      #
-      # (see Chef::Provider#whyrun_supported?)
-      #
-      def whyrun_supported?
-        true
+    class DnsmasqLocalAppDebian < DnsmasqLocalApp
+      if defined?(provides)
+        provides :dnsmasq_local_app, platform_family: 'debian'
       end
 
       #
-      # Install the Dnsmasq package.
+      # Purge the Dnsmasq Debian packages.
       #
-      action :install do
-        package 'dnsmasq'
+      action :remove do
+        %w(dnsmasq dnsmasq-base).each { |p| package(p) { action :purge } }
       end
     end
   end
