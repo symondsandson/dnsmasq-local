@@ -1,6 +1,9 @@
 Dnsmasq Local Cookbook CHANGELOG
 ================================
 
+Unreleased
+----------
+
 v0.4.0 (2016-06-24)
 -------------------
 - Take over management of the Dnsmasq environment variables
