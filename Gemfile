@@ -22,7 +22,7 @@ group :test do
   gem 'fauxhai'
   gem 'test-kitchen'
   gem 'kitchen-vagrant'
-  gem 'kitchen-dokken', github: 'someara/kitchen-dokken'
+  gem 'kitchen-dokken', '>= 0.0.31'
   gem 'kitchen-docker'
 end
 
