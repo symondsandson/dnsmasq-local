@@ -8,7 +8,7 @@ describe 'dnsmasq-local::default' do
   let(:runner) do
     ChefSpec::SoloRunner.new(platform) do |node|
       %i(config environment).each do |a|
-        node.set['dnsmasq_local'][a] = send(a) unless send(a).nil?
+        node.normal['dnsmasq_local'][a] = send(a) unless send(a).nil?
       end
     end
   end

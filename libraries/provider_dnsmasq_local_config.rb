@@ -91,14 +91,12 @@ class Chef
       #
       def config_for(key, val)
         case val
-        when TrueClass, FalseClass
-          key.to_s.tr('_', '-') if val
-        when String, Fixnum
-          "#{key.to_s.tr('_', '-')}=#{val}"
-        when Array
-          val.map { |v| config_for(key, v) }.join("\n")
-        else
-          raise(Exceptions::ValidationFailed, "Invalid: '#{key}' => '#{val}'")
+        when TrueClass, FalseClass then key.to_s.tr('_', '-') if val
+        when String, Fixnum then "#{key.to_s.tr('_', '-')}=#{val}"
+        when Array then val.map { |v| config_for(key, v) }.join("\n")
+        when Hash then config_for(key, val.keys.select { |k| val[k] })
+        else raise(Exceptions::ValidationFailed,
+                   "Invalid: '#{key}' => '#{val}'")
         end
       end
     end

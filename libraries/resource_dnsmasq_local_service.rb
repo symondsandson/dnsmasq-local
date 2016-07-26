@@ -18,6 +18,7 @@
 # limitations under the License.
 #
 
+require 'chef/resource/service'
 require 'chef/resource/lwrp_base'
 
 class Chef
@@ -50,13 +51,22 @@ class Chef
       # (see Chef::Resource#method_missing)
       #
       def method_missing(method_symbol, *args, &block)
-        if block.nil? && args.length == 1
+        if block.nil? && args.length == 1 && !method_symbol.match(/^to_/)
           self.class.attribute method_symbol, kind_of: args[0].class
           add_state_attr(method_symbol)
           send(method_symbol, args[0]) unless args[0].nil?
         else
           super
         end
+      end
+
+      #
+      # Respond to missing methods.
+      #
+      # (see Object#respond_to_missing?)
+      #
+      def respond_to_missing?(method_symbol, *args, &block)
+        block.nil? && args.length == 1 && !method_symbol.match(/^to_/) || super
       end
 
       #
