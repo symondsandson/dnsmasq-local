@@ -13,7 +13,9 @@ describe 'dnsmasq_local_config' do
       step_into: resource, platform: platform, version: platform_version
     ) do |node|
       %i(resource name config properties action).each do |p|
-        node.set['dnsmasq_local_resource_test'][p] = send(p) unless send(p).nil?
+        unless send(p).nil?
+          node.default['dnsmasq_local_resource_test'][p] = send(p)
+        end
       end
     end
   end
@@ -93,6 +95,7 @@ describe 'dnsmasq_local_config' do
               no_hosts: false,
               example: 'elpmaxe',
               server: %w(8.8.8.8 8.8.4.4),
+              ahash: { key1: true, key2: false, key3: true },
               bool: true,
               other_bool: false
             }
@@ -105,6 +108,8 @@ describe 'dnsmasq_local_config' do
             expected = <<-EOH.gsub(/^ {14}/, '').strip
               # This file is managed by Chef.
               # Any changes to it will be overwritten.
+              ahash=key1
+              ahash=key3
               bind-interfaces
               bool
               cache-size=0

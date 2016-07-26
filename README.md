@@ -50,6 +50,10 @@ attributes with an underscore (e.g. `cache_size`).
 Any Dnsmasq setting that is a boolean key with no value (e.g. `proxy_dnssec`)
 can be set to true or false to be enabled or disabled, respectively.
 
+Any setting that can have multiple entries can be set as either an array
+(where all entries will be rendered in the config) or a hash (where entries
+set to false will not be rendered).
+
     default['dnsmasq_local']['config'] = {}
 
 Any key+value can be set under this namespace and it will be merged into the

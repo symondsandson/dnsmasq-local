@@ -11,7 +11,9 @@ describe 'dnsmasq_local_service' do
       step_into: resource, platform: platform, version: platform_version
     ) do |node|
       %i(resource name environment properties action).each do |p|
-        node.set['dnsmasq_local_resource_test'][p] = send(p) unless send(p).nil?
+        unless send(p).nil?
+          node.default['dnsmasq_local_resource_test'][p] = send(p)
+        end
       end
     end
   end
