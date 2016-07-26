@@ -1,6 +1,9 @@
 Dnsmasq Local Cookbook CHANGELOG
 ================================
 
+Unreleased
+----------
+
 v0.5.0 (2016-07-26)
 -------------------
 - Support hashes as config properties
