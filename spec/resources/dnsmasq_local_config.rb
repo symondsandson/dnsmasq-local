@@ -145,6 +145,7 @@ shared_context 'dnsmasq_local_config' do
             no_hosts: false,
             example: 'elpmaxe',
             server: %w(8.8.8.8 8.8.4.4),
+            ahash: { key1: true, key2: false, key3: true },
             bool: true,
             other_bool: false
           }
@@ -157,6 +158,8 @@ shared_context 'dnsmasq_local_config' do
           expected = <<-EOH.gsub(/^ +/, '').strip
             # This file is managed by Chef.
             # Any changes to it will be overwritten.
+            ahash=key1
+            ahash=key3
             bind-interfaces
             bool
             cache-size=0

@@ -170,13 +170,15 @@ Syntax:
 
 Actions:
 
-| Action     | Description         |
-|------------|---------------------|
-| `:enable`  | Enable the service  |
-| `:disable` | Disable the service |
-| `:start`   | Start the service   |
-| `:stop`    | Stop the service    |
-| `:restart` | Restart the service |
+| Action     | Description                                     |
+|------------|-------------------------------------------------|
+| `:create`  | Configure the env variables used by the service |
+| `:remove`  | Remove the service's environment configuration  |
+| `:enable`  | Enable the service                              |
+| `:disable` | Disable the service                             |
+| `:start`   | Start the service                               |
+| `:stop`    | Stop the service                                |
+| `:restart` | Restart the service                             |
 
 Attributes:
 

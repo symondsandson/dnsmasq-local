@@ -10,6 +10,8 @@ platforms:
   - name: ubuntu-14.04
   - name: debian-8.4
   - name: debian-7.10
+  - name: centos-7.2
+  - name: centos-6.7
   - name: ubuntu-14.04-chef-11
     driver:
       box: bento/ubuntu-14.04

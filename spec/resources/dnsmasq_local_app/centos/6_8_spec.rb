@@ -16,8 +16,6 @@ describe 'dnsmasq_local_app::centos::6_8' do
   context 'the :remove action' do
     include_context 'the :remove action'
 
-    it 'raises an error' do
-      expect { chef_run }.to raise_error(NoMethodError)
-    end
+    it_behaves_like 'any RHEL platform'
   end
 end

@@ -29,5 +29,11 @@ shared_context 'dnsmasq_local_app' do
         end
       end
     end
+
+    shared_examples_for 'any RHEL platform' do
+      it 'removes the dnsmasq package' do
+        expect(chef_run).to remove_package('dnsmasq')
+      end
+    end
   end
 end

@@ -22,18 +22,32 @@ require 'chef/version'
 require 'chef/platform/provider_mapping'
 require_relative 'provider_dnsmasq_local'
 require_relative 'provider_dnsmasq_local_app_debian'
+require_relative 'provider_dnsmasq_local_app_rhel'
 require_relative 'provider_dnsmasq_local_config'
 require_relative 'provider_dnsmasq_local_service_debian'
+require_relative 'provider_dnsmasq_local_service_rhel_sysvinit'
+require_relative 'provider_dnsmasq_local_service_rhel_systemd'
 
 if Gem::Version.new(Chef::VERSION) < Gem::Version.new('12')
   Chef::Platform.set(resource: :dnsmasq_local,
                      provider: Chef::Provider::DnsmasqLocal)
   Chef::Platform.set(resource: :dnsmasq_local_app,
                      platform_family: 'debian',
-                     provider: Chef::Provider::DnsmasqLocalApp::Debian)
+                     provider: Chef::Provider::DnsmasqLocalAppDebian)
+  Chef::Platform.set(resource: :dnsmasq_local_app,
+                     platform_family: 'rhel',
+                     provider: Chef::Provider::DnsmasqLocalAppRhel)
   Chef::Platform.set(resource: :dnsmasq_local_config,
                      provider: Chef::Provider::DnsmasqLocalConfig)
   Chef::Platform.set(resource: :dnsmasq_local_service,
                      platform_family: 'debian',
-                     provider: Chef::Provider::DnsmasqLocalService::Debian)
+                     provider: Chef::Provider::DnsmasqLocalServiceDebian)
+  Chef::Platform.set(resource: :dnsmasq_local_service,
+                     platform_family: 'rhel',
+                     platform_version: '< 7',
+                     provider: Chef::Provider::DnsmasqLocalServiceRhelSysvinit)
+  Chef::Platform.set(resource: :dnsmasq_local_service,
+                     platform_family: 'rhel',
+                     platform_version: '>= 7',
+                     provider: Chef::Provider::DnsmasqLocalServiceRhelSystemd)
 end
