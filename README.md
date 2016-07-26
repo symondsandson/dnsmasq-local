@@ -123,6 +123,7 @@ Syntax:
       config(cache_size: 100)
       no_hosts false
       server %w(8.8.8.8 8.8.4.4)
+      interface(eth0: false, eth1: true)
       action :create
     end
 
@@ -153,7 +154,7 @@ Attributes:
 
 \*\* Any unrecognized attribute that is passed in will be assumed to be a
   correct Dnsmasq setting and rendered out to its config. These attributes'
-values can be `true`, `false`, integers, strings, or arrays.
+values can be `true`, `false`, integers, strings, arrays, or hashes.
 
 ***dnsmasq_local_service***
 

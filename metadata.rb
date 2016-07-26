@@ -7,7 +7,7 @@ maintainer_email 'jonathan.hartman@socrata.com'
 license 'apache2'
 description 'Configures a local-only dnsmasq'
 long_description 'Configures a local-only dnsmasq'
-version '0.4.1'
+version '0.5.0'
 
 if respond_to?(:source_url)
   source_url 'https://github.com/socrata-cookbooks/dnsmasq-local'
