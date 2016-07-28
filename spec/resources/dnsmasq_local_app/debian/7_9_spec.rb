@@ -1,21 +1,12 @@
-require_relative '../../../spec_helper'
-require_relative '../../dnsmasq_local_app'
+# encoding: utf-8
+# frozen_string_literal: true
+require_relative '../debian'
 
-describe 'dnsmasq_local_app::debian::7_9' do
-  include_context 'dnsmasq_local_app'
+describe 'resources::dnsmasq_local_app::debian::7_9' do
+  include_context 'resources::dnsmasq_local_app::debian'
 
   let(:platform) { 'debian' }
   let(:platform_version) { '7.9' }
 
-  context 'the default action (:install)' do
-    include_context 'the default action (:install)'
-
-    it_behaves_like 'any platform'
-  end
-
-  context 'the :remove action' do
-    include_context 'the :remove action'
-
-    it_behaves_like 'any Debian platform'
-  end
+  it_behaves_like 'any Debian platform'
 end

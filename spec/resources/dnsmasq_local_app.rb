@@ -1,16 +1,15 @@
-require_relative '../spec_helper'
+# encoding: utf-8
+# frozen_string_literal: true
 require_relative '../resources'
 
-shared_context 'dnsmasq_local_app' do
-  include_context 'any custom resource'
+shared_context 'resources::dnsmasq_local_app' do
+  include_context 'resources'
 
   let(:resource) { 'dnsmasq_local_app' }
   let(:properties) { {} }
   let(:name) { 'default' }
 
   shared_context 'the default action (:install)' do
-    cached(:chef_run) { converge }
-
     shared_examples_for 'any platform' do
       it 'installs the Dnsmasq package' do
         expect(chef_run).to install_package('dnsmasq')
@@ -20,20 +19,5 @@ shared_context 'dnsmasq_local_app' do
 
   shared_context 'the :remove action' do
     let(:action) { :remove }
-    cached(:chef_run) { converge }
-
-    shared_examples_for 'any Debian platform' do
-      it 'purges the dnsmasq packages' do
-        %w(dnsmasq dnsmasq-base).each do |p|
-          expect(chef_run).to purge_package(p)
-        end
-      end
-    end
-
-    shared_examples_for 'any RHEL platform' do
-      it 'removes the dnsmasq package' do
-        expect(chef_run).to remove_package('dnsmasq')
-      end
-    end
   end
 end
