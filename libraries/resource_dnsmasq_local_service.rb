@@ -39,10 +39,7 @@ class Chef
       #
       attribute :environment,
                 kind_of: Hash,
-                default: {
-                  enabled: 1,
-                  config_dir: '/etc/dnsmasq.d,.dpkg-dist,.dpkg-old,.dpkg-new'
-                }
+                default: { config_dir: '/etc/dnsmasq.d' }
 
       #
       # Allow individual attributes to be fed in and merged with the default

@@ -1,4 +1,5 @@
-# Encoding: UTF-8
+# encoding: utf-8
+# frozen_string_literal: true
 #
 # Cookbook Name:: dnsmasq-local
 # Library:: provider_dnsmasq_local_service_debian
@@ -38,13 +39,13 @@ class Chef
           new_resource.state.select { |k, v| k != :environment && !v.nil? }
         )
         file '/etc/default/dnsmasq' do
-          c = <<-EOH.gsub(/^ +/, '')
+          header = <<-EOH.gsub(/^ +/, '')
             # This file is managed by Chef.
             # Any changes to it will be overwritten.
           EOH
-          c << Hash[merged_env.sort].map { |k, v| "#{k.upcase}='#{v}'" }
-               .join("\n")
-          content c
+          body = Hash[merged_env.sort].map { |k, v| "#{k.upcase}='#{v}'" }
+                 .join("\n")
+          content(header + body)
         end
       end
 
