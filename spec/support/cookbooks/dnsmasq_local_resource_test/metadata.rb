@@ -1,4 +1,5 @@
-# Encoding: UTF-8
+# encoding: utf-8
+# frozen_string_literal: true
 
 name 'dnsmasq_local_resource_test'
 maintainer 'Jonathan Hartman'

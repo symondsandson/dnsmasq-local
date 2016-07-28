@@ -1,16 +1,18 @@
-require_relative '../spec_helper'
+# encoding: utf-8
+# frozen_string_literal: true
 require_relative '../resources'
 
-shared_context 'dnsmasq_local' do
-  include_context 'any custom resource'
+shared_context 'resources::dnsmasq_local' do
+  include_context 'resources'
 
   let(:resource) { 'dnsmasq_local' }
-  let(:properties) { { config: nil, environment: nil } }
+  %i(config environment).each { |p| let(p) { nil } }
+  let(:properties) { { config: config, environment: environment } }
   let(:name) { 'default' }
-
-  shared_context 'the default action (:create)' do
-    shared_examples_for 'any platform' do
-      shared_examples_for 'any attributes' do
+  
+  shared_examples_for 'any platform' do
+    context 'the default action (:create)' do
+      shared_examples_for 'any attribute set' do
         it 'creates the dnsmasq_local_config' do
           expected = {
             config: {
@@ -21,7 +23,7 @@ shared_context 'dnsmasq_local' do
               proxy_dnssec: true,
               query_port: 0
             }
-          }.merge(properties[:config].to_h)
+          }.merge(config.to_h)
           expect(chef_run).to create_dnsmasq_local_config('default')
             .with(expected)
           expect(chef_run.dnsmasq_local_config('default'))
@@ -40,7 +42,7 @@ shared_context 'dnsmasq_local' do
               config_dir: '/etc/dnsmasq.d,.dpkg-dist,.dpkg-old,.dpkg-new',
               enabled: 1
             }
-          }.merge(properties[:environment].to_h)
+          }.merge(environment.to_h)
           expect(chef_run).to create_dnsmasq_local_service('default')
             .with(expected)
           expect(chef_run).to enable_dnsmasq_local_service('default')
@@ -49,46 +51,38 @@ shared_context 'dnsmasq_local' do
       end
 
       context 'the default attributes' do
-        cached(:chef_run) { converge }
-
-        it_behaves_like 'any attributes'
+        it_behaves_like 'any attribute set'
       end
 
       context 'a config attribute' do
-        let(:properties) { { config: { example: 'elpmaxe' } } }
-        cached(:chef_run) { converge }
+        let(:config) { { example: 'elpmaxe' } }
 
-        it_behaves_like 'any attributes'
+        it_behaves_like 'any attribute set'
       end
 
       context 'an environment attribute' do
-        let(:properties) { { environment: { example: 'elpmaxe' } } }
-        cached(:chef_run) { converge }
+        let(:environment) { { example: 'elpmaxe' } }
 
-        it_behaves_like 'any attributes'
+        it_behaves_like 'any attribute set'
       end
     end
   end
 
-  shared_context 'the :remove action' do
+  context 'the :remove action' do
     let(:action) { :remove }
 
-    shared_examples_for 'any platform' do
-      cached(:chef_run) { converge }
+    it 'stops, disables, and removes the dnsmasq_local_service' do
+      expect(chef_run).to stop_dnsmasq_local_service('default')
+      expect(chef_run).to disable_dnsmasq_local_service('default')
+      expect(chef_run).to remove_dnsmasq_local_service('default')
+    end
 
-      it 'stops, disables, and removes the dnsmasq_local_service' do
-        expect(chef_run).to stop_dnsmasq_local_service('default')
-        expect(chef_run).to disable_dnsmasq_local_service('default')
-        expect(chef_run).to remove_dnsmasq_local_service('default')
-      end
+    it 'removes the dnsmasq_local_config' do
+      expect(chef_run).to remove_dnsmasq_local_config('default')
+    end
 
-      it 'removes the dnsmasq_local_config' do
-        expect(chef_run).to remove_dnsmasq_local_config('default')
-      end
-
-      it 'removes the dnsmasq_local_app' do
-        expect(chef_run).to remove_dnsmasq_local_app('default')
-      end
+    it 'removes the dnsmasq_local_app' do
+      expect(chef_run).to remove_dnsmasq_local_app('default')
     end
   end
 end
