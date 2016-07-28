@@ -17,5 +17,9 @@ if respond_to?(:issues_url)
 end
 
 supports 'ubuntu'
+supports 'debian'
+supports 'redhat'
+supports 'centos'
+supports 'scientific'
 
 conflicts 'dnsmasq'
