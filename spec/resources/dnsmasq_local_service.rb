@@ -7,8 +7,8 @@ shared_context 'resources::dnsmasq_local_service' do
   include_context 'resources'
 
   let(:resource) { 'dnsmasq_local_service' }
-  %i(environment).each { |p| let(p) { nil } }
-  let(:properties) { { environment: environment } }
+  %i(options).each { |p| let(p) { nil } }
+  let(:properties) { { options: options } }
   let(:name) { 'default' }
 
   shared_examples_for 'any platform' do
@@ -18,7 +18,7 @@ shared_context 'resources::dnsmasq_local_service' do
           expected = <<-EOH.gsub(/^ +/, '').strip
             # This file is managed by Chef.
             # Any changes to it will be overwritten.
-            CONFIG_DIR='/etc/dnsmasq.d'
+            DNSMASQ_OPTS=''
           EOH
           expect(chef_run).to create_file('/etc/default/dnsmasq')
             .with(content: expected)
@@ -46,38 +46,35 @@ shared_context 'resources::dnsmasq_local_service' do
           expected = <<-EOH.gsub(/^ +/, '').strip
             # This file is managed by Chef.
             # Any changes to it will be overwritten.
-            CONFIG_DIR='/etc/dnsmasq.d'
+            DNSMASQ_OPTS=''
           EOH
           expect(chef_run).to create_file('/etc/default/dnsmasq')
             .with(content: expected)
         end
       end
 
-      context 'a default environment override' do
-        let(:environment) { { enabled: 0, config_dir: '/tmp', testing: 'yes' } }
+      context 'a default options override' do
+        let(:options) { { thing_1: true, thing_2: 'test', bad: false } }
 
         it 'generates the expected defaults file' do
           expected = <<-EOH.gsub(/^ +/, '').strip
             # This file is managed by Chef.
             # Any changes to it will be overwritten.
-            CONFIG_DIR='/tmp'
-            ENABLED='0'
-            TESTING='yes'
+            DNSMASQ_OPTS='--thing-1 --thing-2=test'
           EOH
           expect(chef_run).to create_file('/etc/default/dnsmasq')
             .with(content: expected)
         end
       end
 
-      context 'some extra environment vars to merge in with the default' do
-        let(:properties) { { dnsmasq_opts: '--bind-dynamic' } }
+      context 'some extra options to merge in with the default' do
+        let(:properties) { { thing_1: true, thing_2: 'test', bad: false } }
 
         it 'generates the expected defaults file' do
           expected = <<-EOH.gsub(/^ +/, '').strip
             # This file is managed by Chef.
             # Any changes to it will be overwritten.
-            CONFIG_DIR='/etc/dnsmasq.d'
-            DNSMASQ_OPTS='--bind-dynamic'
+            DNSMASQ_OPTS='--thing-1 --thing-2=test'
           EOH
           expect(chef_run).to create_file('/etc/default/dnsmasq')
             .with(content: expected)

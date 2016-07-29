@@ -6,8 +6,8 @@ shared_context 'resources::dnsmasq_local' do
   include_context 'resources'
 
   let(:resource) { 'dnsmasq_local' }
-  %i(config environment).each { |p| let(p) { nil } }
-  let(:properties) { { config: config, environment: environment } }
+  %i(config options).each { |p| let(p) { nil } }
+  let(:properties) { { config: config, options: options } }
   let(:name) { 'default' }
   
   shared_examples_for 'any platform' do
@@ -37,14 +37,8 @@ shared_context 'resources::dnsmasq_local' do
         end
 
         it 'creates, enables, and starts the dnsmasq_local_service' do
-          expected = {
-            environment: {
-              config_dir: '/etc/dnsmasq.d,.dpkg-dist,.dpkg-old,.dpkg-new',
-              enabled: 1
-            }
-          }.merge(environment.to_h)
           expect(chef_run).to create_dnsmasq_local_service('default')
-            .with(expected)
+            .with(options.to_h)
           expect(chef_run).to enable_dnsmasq_local_service('default')
           expect(chef_run).to start_dnsmasq_local_service('default')
         end
@@ -60,8 +54,8 @@ shared_context 'resources::dnsmasq_local' do
         it_behaves_like 'any attribute set'
       end
 
-      context 'an environment attribute' do
-        let(:environment) { { example: 'elpmaxe' } }
+      context 'an options attribute' do
+        let(:options) { { example: 'elpmaxe' } }
 
         it_behaves_like 'any attribute set'
       end

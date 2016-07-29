@@ -3,11 +3,11 @@
 require_relative '../spec_helper'
 
 describe 'dnsmasq-local::default' do
-  %i(config environment).each { |a| let(a) { nil } }
+  %i(config options).each { |a| let(a) { nil } }
   let(:platform) { { platform: 'ubuntu', version: '14.04' } }
   let(:runner) do
     ChefSpec::SoloRunner.new(platform) do |node|
-      %i(config environment).each do |a|
+      %i(config options).each do |a|
         node.normal['dnsmasq_local'][a] = send(a) unless send(a).nil?
       end
     end
@@ -17,7 +17,7 @@ describe 'dnsmasq-local::default' do
   shared_examples_for 'any attribute set' do
     it 'creates a dnsmasq_local resource' do
       expect(chef_run).to create_dnsmasq_local('default')
-        .with(config: config || {}, environment: environment || {})
+        .with(config: config || {}, options: options || {})
     end
   end
 
@@ -33,8 +33,8 @@ describe 'dnsmasq-local::default' do
     it_behaves_like 'any attribute set'
   end
 
-  context 'an overridden environment attribute' do
-    let(:environment) { { 'dnsmasq_opts' => '--bind-dynamic' } }
+  context 'an overridden options attribute' do
+    let(:options) { { 'bind_dynamic' => true } }
 
     it_behaves_like 'any attribute set'
   end

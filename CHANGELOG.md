@@ -3,6 +3,8 @@ Dnsmasq Local Cookbook CHANGELOG
 
 Unreleased
 ----------
+- Add support RHEL and RHEL-alike platforms
+- Replace the "environment" attribute/property with command line "options"
 
 v0.5.0 (2016-07-26)
 -------------------

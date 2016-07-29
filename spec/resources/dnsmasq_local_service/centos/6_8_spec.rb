@@ -15,27 +15,6 @@ describe 'resources::dnsmasq_local_service::centos::6_8' do
     before(:each) do
       allow(File).to receive(:read).and_call_original
       orig = <<-EOH.gsub(/^ {8}/, '')
-        #!/bin/sh
-        #
-        # Startup script for the DNS caching server
-        #
-        # chkconfig: - 49 50
-        # description: This script starts your DNS caching server
-        # processname: dnsmasq
-        # pidfile: /var/run/dnsmasq.pid
-
-        # Source function library.
-        . /etc/rc.d/init.d/functions
-
-        # Source networking configuration.
-        . /etc/sysconfig/network
-
-        # Check that networking is up.
-        [ ${NETWORKING} = "no" ] && exit 0
-
-        dnsmasq=/usr/sbin/dnsmasq
-        [ -f $dnsmasq ] || exit 0
-
         DOMAIN_SUFFIX=`dnsdomainname`
         if [ ! -z "${DOMAIN_SUFFIX}" ]; then
           OPTIONS="-s $DOMAIN_SUFFIX"
@@ -51,27 +30,6 @@ describe 'resources::dnsmasq_local_service::centos::6_8' do
 
     it 'patches the dnsmasq init script to use env vars' do
       expected = <<-EOH.gsub(/^ {8}/, '')
-        #!/bin/sh
-        #
-        # Startup script for the DNS caching server
-        #
-        # chkconfig: - 49 50
-        # description: This script starts your DNS caching server
-        # processname: dnsmasq
-        # pidfile: /var/run/dnsmasq.pid
-
-        # Source function library.
-        . /etc/rc.d/init.d/functions
-
-        # Source networking configuration.
-        . /etc/sysconfig/network
-
-        # Check that networking is up.
-        [ ${NETWORKING} = "no" ] && exit 0
-
-        dnsmasq=/usr/sbin/dnsmasq
-        [ -f $dnsmasq ] || exit 0
-
         DOMAIN_SUFFIX=`dnsdomainname`
         if [ ! -z "${DOMAIN_SUFFIX}" ]; then
           OPTIONS="-s $DOMAIN_SUFFIX"
@@ -79,23 +37,6 @@ describe 'resources::dnsmasq_local_service::centos::6_8' do
 
         . /etc/default/dnsmasq
 
-        for INTERFACE in $DNSMASQ_INTERFACE; do
-          DNSMASQ_INTERFACES="$DNSMASQ_INTERFACES -i $INTERFACE"
-        done
-
-        for INTERFACE in $DNSMASQ_EXCEPT; do
-          DNSMASQ_INTERFACES="$DNSMASQ_INTERFACES -I $INTERFACE"
-        done
-
-        [ -n "$MAILHOSTNAME" ] && OPTIONS="$OPTIONS -m $MAILHOSTNAME"
-        [ -n "$MAILTARGET" ] && OPTIONS="$OPTIONS -t $MAILTARGET"
-        [ -n "$DNSMASQ_USER" ] && OPTIONS="$OPTIONS -u $DNSMASQ_USER"
-        [ -n "$DNSMASQ_INTERFACES" ] && OPTIONS="$OPTIONS $DNSMASQ_INTERFACES"
-        [ -n "$DHCP_LEASE" ] && OPTIONS="$OPTIONS -l $DHCP_LEASE"
-        [ -n "$DOMAIN_SUFFIX" ] && OPTIONS="$OPTIONS -s $DOMAIN_SUFFIX"
-        [ -n "$RESOLV_CONF" ] && OPTIONS="$OPTIONS -r $RESOLV_CONF"
-        [ -n "$CACHESIZE" ] && OPTIONS="$OPTIONS -c $CACHESIZE"
-        [ -n "$CONFIG_DIR" ] && OPTIONS="$OPTIONS -7 $CONFIG_DIR"
         [ -n "$DNSMASQ_OPTS" ] && OPTIONS="$OPTIONS $DNSMASQ_OPTS"
 
         RETVAL=0

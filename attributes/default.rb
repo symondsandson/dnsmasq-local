@@ -19,4 +19,4 @@
 #
 
 default['dnsmasq_local']['config'] = {}
-default['dnsmasq_local']['environment'] = {}
+default['dnsmasq_local']['options'] = {}

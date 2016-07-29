@@ -8,8 +8,7 @@ describe 'dnsmasq-local::default::service' do
       expected = <<-EOH.gsub(/^ +/, '').strip
         # This file is managed by Chef.
         # Any changes to it will be overwritten.
-        CONFIG_DIR='/etc/dnsmasq.d,.dpkg-dist,.dpkg-old,.dpkg-new'
-        ENABLED='1'
+        DNSMASQ_OPTS=''
       EOH
       expect(subject.content).to eq(expected)
     end

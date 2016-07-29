@@ -34,63 +34,24 @@ class Chef
       end
 
       #
-      # Generate the `/etc/default/dnsmasq` file for the service.
+      # Patch the RHEL < 7 init script to pass on the DNSMASQ_OPTS environment
+      # variable set in /etc/default/dnsmasq.
+      #
+      # (see Chef::Provider::DnsmasqLocalService#action_create)
       #
       action :create do
-        merged_env = new_resource.environment.merge(
-          new_resource.state.select { |k, v| k != :environment && !v.nil? }
-        )
-        file '/etc/default/dnsmasq' do
-          header = <<-EOH.gsub(/^ +/, '')
-            # This file is managed by Chef.
-            # Any changes to it will be overwritten.
-          EOH
-          body = Hash[merged_env.sort].map { |k, v| "#{k.upcase}='#{v}'" }
-                 .join("\n")
-          content(header + body)
-        end
+        super()
         file '/etc/init.d/dnsmasq' do
           mode '0755'
           content lazy {
-            orig = ::File.read('/etc/init.d/dnsmasq')
-            lines = orig.lines
+            lines = ::File.read('/etc/init.d/dnsmasq').lines
             idx = lines.index { |l| l.strip == 'RETVAL=0' }
 
-            lines.insert(idx, "\n")
-            {
-              'DNSMASQ_OPTS' => nil,
-              'CONFIG_DIR' => '-7',
-              'CACHESIZE' => '-c',
-              'RESOLV_CONF' => '-r',
-              'DOMAIN_SUFFIX' => '-s',
-              'DHCP_LEASE' => '-l',
-              'DNSMASQ_INTERFACES' => nil,
-              'DNSMASQ_USER' => '-u',
-              'MAILTARGET' => '-t',
-              'MAILHOSTNAME' => '-m',
-            }.each do |opt, switch|
-              newline = "[ -n \"$#{opt}\" ] && " \
-                        "OPTIONS=\"$OPTIONS #{switch}#{' ' if switch}$#{opt}" \
-                        "\"\n"
-              lines.insert(idx, newline) unless lines.include?(newline)
-            end
-            lines.insert(idx, "\n")
-            newstr = <<-EOH.gsub(/^ {14}/, '')
-              for INTERFACE in $DNSMASQ_EXCEPT; do
-                DNSMASQ_INTERFACES="$DNSMASQ_INTERFACES -I $INTERFACE"
-              done
-            EOH
-            lines.insert(idx, newstr) unless orig.include?(newstr)
-            lines.insert(idx, "\n")
-            newstr = <<-EOH.gsub(/^ {14}/, '')
-              for INTERFACE in $DNSMASQ_INTERFACE; do
-                DNSMASQ_INTERFACES="$DNSMASQ_INTERFACES -i $INTERFACE"
-              done
-            EOH
-            lines.insert(idx, newstr) unless orig.include?(newstr)
-            lines.insert(idx, "\n")
-            newstr = ". /etc/default/dnsmasq\n"
-            lines.insert(idx, newstr) unless lines.include?(newstr)
+            nl = '[ -n "$DNSMASQ_OPTS" ] && OPTIONS="$OPTIONS $DNSMASQ_OPTS"'
+            lines.insert(idx, "\n#{nl}\n\n") unless lines.include?("#{nl}\n")
+
+            nl = '. /etc/default/dnsmasq'
+            lines.insert(idx, "#{nl}\n") unless lines.include?("#{nl}\n")
             lines.join
           }
         end
@@ -100,9 +61,8 @@ class Chef
       # Clean up the service files that are managed by Chef.
       #
       action :remove do
-        %w(/etc/default/dnsmasq /etc/init.d/dnsmasq).each do |f|
-          file(f) { action :delete }
-        end
+        super()
+        file('/etc/init.d/dnsmasq') { action :delete }
       end
     end
   end

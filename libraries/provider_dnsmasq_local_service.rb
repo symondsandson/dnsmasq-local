@@ -39,6 +39,36 @@ class Chef
       end
 
       #
+      # Generate the `/etc/default/dnsmasq` file for the service.
+      #
+      action :create do
+        merged_options = new_resource.options.merge(
+          new_resource.state.select { |k, v| k != :options && !v.nil? }
+        )
+        file '/etc/default/dnsmasq' do
+          header = <<-EOH.gsub(/^ +/, '')
+            # This file is managed by Chef.
+            # Any changes to it will be overwritten.
+          EOH
+          opts_str = merged_options.map do |k, v|
+            if v == true
+              "--#{k.to_s.gsub('_', '-')}"
+            elsif v
+              "--#{k.to_s.gsub('_', '-')}=#{v}"
+            end
+          end.compact.join(' ')
+          content(header + "DNSMASQ_OPTS='#{opts_str}'")
+        end
+      end
+
+      #
+      # Clean up the defaults file.
+      #
+      action :remove do
+        file('/etc/default/dnsmasq') { action :delete }
+      end
+
+      #
       # Every action that isn't :create or :remove should be passed on to a
       # standard Chef service resource.
       #
