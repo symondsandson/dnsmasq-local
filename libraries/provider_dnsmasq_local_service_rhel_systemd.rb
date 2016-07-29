@@ -36,15 +36,34 @@ class Chef
       # Generate the `/etc/default/dnsmasq` file for the service.
       #
       action :create do
-        merged_env = new_resource.environment.merge(
-          new_resource.state.select { |k, v| k != :environment && !v.nil? }
-        )
+        super()
+        execute 'systemctl daemon-reload' do
+          action :nothing
+        end
+        file '/usr/lib/systemd/system/dnsmasq.service' do
+          content lazy {
+            orig = ::File.read('/usr/lib/systemd/system/dnsmasq.service')
+            lines = orig.lines
+            idx = lines.index { |l| l.start_with?('ExecStart') }
+            lines.insert(idx, "EnvironmentFile=/etc/default/dnsmasq\n")
+            lines.join
+
+            idx = lines.index do |l|
+              l.strip == 'ExecStart=/usr/sbin/dnsmasq -k'
+            end
+            lines[idx] = lines[idx].strip + " $DNSMASQ_OPTS\n" if idx
+            lines.join
+          }
+          notifies :run, 'execute[systemctl daemon-reload]', :immediately
+        end
       end
 
       #
       # Clean up the service files that are managed by Chef.
       #
       action :remove do
+        super()
+        file('/usr/lib/systemd/system/dnsmasq.service') { action :delete }
       end
     end
   end

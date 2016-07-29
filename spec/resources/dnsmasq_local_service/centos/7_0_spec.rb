@@ -1,8 +1,10 @@
-require_relative '../../../spec_helper'
-require_relative '../../dnsmasq_local_service'
+# encoding: utf-8
+# frozen_string_literal: true
 
-describe 'dnsmasq_local_service::centos::7_0' do
-  include_context 'dnsmasq_local_service'
+require_relative '../rhel'
+
+describe 'resources::dnsmasq_local_service::centos::7_0' do
+  include_context 'resources::dnsmasq_local_service::rhel'
 
   let(:platform) { 'centos' }
   let(:platform_version) { '7.0' }
@@ -48,6 +50,26 @@ describe 'dnsmasq_local_service::centos::7_0' do
       expect(chef_run.execute('systemctl daemon-reload')).to do_nothing
       expect(chef_run.file('/usr/lib/systemd/system/dnsmasq.service'))
         .to notify('execute[systemctl daemon-reload]').to(:run).immediately
+    end
+  end
+
+  context 'the default action ([:create, :enable, :start])' do
+    include_context description
+
+    it_behaves_like 'systemd patching'
+  end
+
+  context 'the :create action' do
+    include_context description
+
+    it_behaves_like 'systemd patching'
+  end
+
+  context 'the :remove action' do
+    include_context description
+
+    it 'deletes the Dnsmasq Systemd file' do
+      expect(chef_run).to delete_file('/usr/lib/systemd/system/dnsmasq.service')
     end
   end
 end
