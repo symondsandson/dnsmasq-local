@@ -44,6 +44,13 @@ class Chef
       action :install do
         package 'dnsmasq'
       end
+
+      #
+      # Upgrade the Dnsmasq package.
+      #
+      action :upgrade do
+        package('dnsmasq') { action :upgrade }
+      end
     end
   end
 end

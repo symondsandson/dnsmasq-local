@@ -5,13 +5,9 @@ require_relative '../dnsmasq_local_app'
 shared_context 'resources::dnsmasq_local_app::debian' do
   include_context 'resources::dnsmasq_local_app'
 
+  it_behaves_like 'any platform'
+
   shared_examples_for 'any Debian platform' do
-    context 'the default action (:install)' do
-      include_context description
-
-      it_behaves_like 'any platform'
-    end
-
     context 'the :remove action' do
       include_context description
 

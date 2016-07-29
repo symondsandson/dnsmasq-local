@@ -9,10 +9,18 @@ shared_context 'resources::dnsmasq_local_app' do
   let(:properties) { {} }
   let(:name) { 'default' }
 
-  shared_context 'the default action (:install)' do
-    shared_examples_for 'any platform' do
+  shared_examples_for 'any platform' do
+    context 'the default action (:install)' do
       it 'installs the Dnsmasq package' do
         expect(chef_run).to install_package('dnsmasq')
+      end
+    end
+
+    context 'the :upgrade action' do
+      let(:action) { :upgrade }
+
+      it 'upgrades the Dnsmasq package' do
+        expect(chef_run).to upgrade_package('dnsmasq')
       end
     end
   end

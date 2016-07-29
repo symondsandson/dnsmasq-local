@@ -28,7 +28,7 @@ class Chef
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
     class DnsmasqLocalApp < LWRPBase
       self.resource_name = :dnsmasq_local_app
-      actions :install, :remove
+      actions :install, :upgrade, :remove
       default_action :install
     end
   end
