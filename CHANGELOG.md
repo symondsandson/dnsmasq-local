@@ -6,6 +6,7 @@ Unreleased
 - Add support RHEL and RHEL-alike platforms
 - Replace the "environment" attribute/property with command line "options"
 - Add an :upgrade action to the dnsmasq_local_app resource
+- Add a "version" attribute to the dnsmasq_local_app resource
 
 v0.5.0 (2016-07-26)
 -------------------

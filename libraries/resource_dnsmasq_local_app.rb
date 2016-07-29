@@ -30,6 +30,11 @@ class Chef
       self.resource_name = :dnsmasq_local_app
       actions :install, :upgrade, :remove
       default_action :install
+
+      #
+      # Allow the user to specify a package version to install.
+      #
+      attribute :version, kind_of: String
     end
   end
 end

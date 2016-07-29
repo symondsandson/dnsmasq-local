@@ -42,7 +42,9 @@ class Chef
       # Install the Dnsmasq package.
       #
       action :install do
-        package 'dnsmasq'
+        package 'dnsmasq' do
+          version new_resource.version unless new_resource.version.nil?
+        end
       end
 
       #
