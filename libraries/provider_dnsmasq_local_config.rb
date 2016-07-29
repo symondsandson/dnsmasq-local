@@ -44,6 +44,13 @@ class Chef
       # in it.
       #
       action :create do
+        file '/etc/dnsmasq.conf' do
+          content <<-EOH.gsub(/^ +/, '').strip
+            # This file is managed by Chef.
+            # Any changes to it will be overwritten.
+            conf-dir=/etc/dnsmasq.d
+          EOH
+        end
         directory '/etc/dnsmasq.d'
         merged_config = new_resource.config.merge(
           new_resource.state.select { |k, v| k != :config && !v.nil? }

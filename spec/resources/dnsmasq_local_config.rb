@@ -1,25 +1,35 @@
-require_relative '../spec_helper'
+# encoding: utf-8
+# frozen_string_literal: true
 require_relative '../resources'
 
-shared_context 'dnsmasq_local_config' do
-  include_context 'any custom resource'
+shared_context 'resources::dnsmasq_local_config' do
+  include_context 'resources'
 
   let(:resource) { 'dnsmasq_local_config' }
-  let(:properties) { { config: nil } }
+  %i(config).each { |p| let(p) { nil } }
+  let(:properties) { { config: config } }
   let(:name) { 'default' }
 
-  shared_context 'the default action (:create)' do
-    shared_examples_for 'any platform' do
-      shared_examples_for 'any attributes' do
+  shared_examples_for 'any platform' do
+    context 'the default action (:create)' do
+      shared_examples_for 'any attribute set' do
+        it 'creates the main dnsmasq.conf file' do
+          expected = <<-EOH.gsub(/^ +/, '').strip
+            # This file is managed by Chef.
+            # Any changes to it will be overwritten.
+            conf-dir=/etc/dnsmasq.d
+          EOH
+          expect(chef_run).to create_file('/etc/dnsmasq.conf')
+            .with(content: expected)
+        end
+
         it 'creates the dnsmasq.d directory' do
           expect(chef_run).to create_directory('/etc/dnsmasq.d')
         end
       end
 
       context 'the default attributes' do
-        cached(:chef_run) { converge }
-
-        it_behaves_like 'any attributes'
+        it_behaves_like 'any attribute set'
 
         it 'generates the expected config' do
           expected = <<-EOH.gsub(/^ +/, '').strip
@@ -38,20 +48,17 @@ shared_context 'dnsmasq_local_config' do
       end
 
       context 'a default config override' do
-        let(:properties) do
+        let(:config) do
           {
-            config: {
-              interface: 'docker0',
-              no_hosts: false,
-              example: 'elpmaxe',
-              bool: true,
-              other_bool: false
-            }
+            interface: 'docker0',
+            no_hosts: false,
+            example: 'elpmaxe',
+            bool: true,
+            other_bool: false
           }
         end
-        cached(:chef_run) { converge }
 
-        it_behaves_like 'any attributes'
+        it_behaves_like 'any attribute set'
 
         it 'generates the expected config' do
           expected = <<-EOH.gsub(/^ +/, '').strip
@@ -77,9 +84,8 @@ shared_context 'dnsmasq_local_config' do
             other_bool: false
           }
         end
-        cached(:chef_run) { converge }
 
-        it_behaves_like 'any attributes'
+        it_behaves_like 'any attribute set'
 
         it 'generates the expected config' do
           expected = <<-EOH.gsub(/^ +/, '').strip
@@ -101,8 +107,7 @@ shared_context 'dnsmasq_local_config' do
       end
 
       context 'an invalid config attribute' do
-        let(:properties) { { config: { example: :bad } } }
-        cached(:chef_run) { converge }
+        let(:config) { { example: :bad } }
 
         it 'raises an error' do
           expected = Chef::Exceptions::ValidationFailed
@@ -110,20 +115,17 @@ shared_context 'dnsmasq_local_config' do
         end
       end
       context 'a default config override' do
-        let(:properties) do
+        let(:config) do
           {
-            config: {
-              interface: 'docker0',
-              no_hosts: false,
-              example: 'elpmaxe',
-              bool: true,
-              other_bool: false
-            }
+            interface: 'docker0',
+            no_hosts: false,
+            example: 'elpmaxe',
+            bool: true,
+            other_bool: false
           }
         end
-        cached(:chef_run) { converge }
 
-        it_behaves_like 'any attributes'
+        it_behaves_like 'any attribute set'
 
         it 'generates the expected config' do
           expected = <<-EOH.gsub(/^ +/, '').strip
@@ -150,9 +152,8 @@ shared_context 'dnsmasq_local_config' do
             other_bool: false
           }
         end
-        cached(:chef_run) { converge }
 
-        it_behaves_like 'any attributes'
+        it_behaves_like 'any attribute set'
 
         it 'generates the expected config' do
           expected = <<-EOH.gsub(/^ +/, '').strip
@@ -176,8 +177,7 @@ shared_context 'dnsmasq_local_config' do
       end
 
       context 'an invalid config attribute' do
-        let(:properties) { { config: { example: :bad } } }
-        cached(:chef_run) { converge }
+        let(:config) { { example: :bad } }
 
         it 'raises an error' do
           expected = Chef::Exceptions::ValidationFailed
@@ -187,16 +187,12 @@ shared_context 'dnsmasq_local_config' do
     end
   end
 
-  shared_context 'the :remove action' do
+  context 'the :remove action' do
     let(:action) { :remove }
 
-    shared_examples_for 'any platform' do
-      cached(:chef_run) { converge }
-
-      it 'deletes the dnsmasq.d directory' do
-        expect(chef_run).to delete_directory('/etc/dnsmasq.d')
-          .with(recursive: true)
-      end
+    it 'deletes the dnsmasq.d directory' do
+      expect(chef_run).to delete_directory('/etc/dnsmasq.d')
+        .with(recursive: true)
     end
   end
 end
