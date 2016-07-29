@@ -9,7 +9,7 @@ shared_context 'resources::dnsmasq_local' do
   %i(config options).each { |p| let(p) { nil } }
   let(:properties) { { config: config, options: options } }
   let(:name) { 'default' }
-  
+
   shared_examples_for 'any platform' do
     context 'the default action (:create)' do
       shared_examples_for 'any attribute set' do

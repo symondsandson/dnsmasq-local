@@ -1,5 +1,5 @@
-# Encoding: UTF-8
-#
+# encoding: utf-8
+# frozen_string_literal: true
 
 name 'dnsmasq-local'
 maintainer 'Jonathan Hartman'

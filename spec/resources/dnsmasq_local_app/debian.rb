@@ -11,7 +11,7 @@ shared_context 'resources::dnsmasq_local_app::debian' do
 
       it_behaves_like 'any platform'
     end
-  
+
     context 'the :remove action' do
       include_context description
 

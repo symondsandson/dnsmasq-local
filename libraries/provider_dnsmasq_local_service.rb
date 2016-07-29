@@ -1,4 +1,5 @@
-# Encoding: UTF-8
+# encoding: utf-8
+# frozen_string_literal: true
 #
 # Cookbook Name:: dnsmasq-local
 # Library:: provider_dnsmasq_local_service
@@ -52,9 +53,9 @@ class Chef
           EOH
           opts_str = merged_options.map do |k, v|
             if v == true
-              "--#{k.to_s.gsub('_', '-')}"
+              "--#{k.to_s.tr('_', '-')}"
             elsif v
-              "--#{k.to_s.gsub('_', '-')}=#{v}"
+              "--#{k.to_s.tr('_', '-')}=#{v}"
             end
           end.compact.join(' ')
           content(header + "DNSMASQ_OPTS='#{opts_str}'")

@@ -1,5 +1,6 @@
-# Encoding: UTF-8
-#
+# encoding: utf-8
+# frozen_string_literal: true#
+
 # Cookbook Name:: dnsmasq-local
 # Library:: provider_dnsmasq_local_app_rhel
 #
@@ -26,9 +27,7 @@ class Chef
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
     class DnsmasqLocalAppDebianRhel < DnsmasqLocalApp
-      if defined?(provides)
-        provides :dnsmasq_local_app, platform_family: 'rhel'
-      end
+      provides :dnsmasq_local_app, platform_family: 'rhel' if defined?(provides)
 
       #
       # Remove the Dnsmasq package.
