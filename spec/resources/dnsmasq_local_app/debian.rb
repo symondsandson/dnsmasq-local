@@ -8,6 +8,24 @@ shared_context 'resources::dnsmasq_local_app::debian' do
   it_behaves_like 'any platform'
 
   shared_examples_for 'any Debian platform' do
+    context 'the default action (:install)' do
+      include_context description
+
+      it 'tells APT To leave the config files in place' do
+        expect(chef_run).to install_package('dnsmasq')
+          .with(options: '-o Dpkg::Options::="--force-confold"')
+      end
+    end
+
+    context 'the :upgrade action' do
+      include_context description
+
+      it 'tells APT To leave the config files in place' do
+        expect(chef_run).to upgrade_package('dnsmasq')
+          .with(options: '-o Dpkg::Options::="--force-confold"')
+      end
+    end
+
     context 'the :remove action' do
       include_context description
 

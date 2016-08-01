@@ -32,6 +32,26 @@ class Chef
       end
 
       #
+      # Force APT to leave the Chef-generated config file in place.
+      #
+      action :install do
+        package 'dnsmasq' do
+          version new_resource.version unless new_resource.version.nil?
+          options '-o Dpkg::Options::="--force-confold"'
+        end
+      end
+
+      #
+      # Force APT to leave the Chef-generated config file in place.
+      #
+      action :upgrade do
+        package 'dnsmasq' do
+          options '-o Dpkg::Options::="--force-confold"'
+          action :upgrade
+        end
+      end
+
+      #
       # Purge the Dnsmasq Debian packages.
       #
       action :remove do

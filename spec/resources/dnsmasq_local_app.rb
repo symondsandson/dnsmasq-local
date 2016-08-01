@@ -36,6 +36,13 @@ shared_context 'resources::dnsmasq_local_app' do
     end
   end
 
+  shared_context 'the default action (:install)' do
+  end
+
+  shared_context 'the :upgrade action' do
+    let(:action) { :upgrade }
+  end
+
   shared_context 'the :remove action' do
     let(:action) { :remove }
   end
