@@ -30,13 +30,6 @@ platforms:
     driver:
       image: debian:8
       pid_one_command: /lib/systemd/systemd
-  - name: debian-7
-    driver:
-      image: debian:7
-      pid_one_command: /sbin/init
-      intermediate_instructions:
-        - RUN dpkg-divert --remove /sbin/initctl
-        - RUN ln -sf /sbin/initctl.distrib /sbin/initctl
   - name: centos-7
     driver:
       image: centos:7
