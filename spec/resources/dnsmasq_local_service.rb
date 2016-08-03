@@ -113,4 +113,12 @@ shared_context 'resources::dnsmasq_local_service' do
   shared_context 'the :remove action' do
     let(:action) { :remove }
   end
+
+  shared_context 'the :enable action' do
+    let(:action) { :enable }
+  end
+
+  shared_context 'the :disable action' do
+    let(:action) { :disable }
+  end
 end

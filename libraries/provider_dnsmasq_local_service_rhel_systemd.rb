@@ -19,14 +19,14 @@
 # limitations under the License.
 #
 
-require_relative 'provider_dnsmasq_local_service'
+require_relative 'provider_dnsmasq_local_service_rhel'
 
 class Chef
   class Provider
     # A Chef provider for Systemd RHEL services.
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
-    class DnsmasqLocalServiceRhelSystemd < DnsmasqLocalService
+    class DnsmasqLocalServiceRhelSystemd < DnsmasqLocalServiceRhel
       if defined?(provides)
         provides :dnsmasq_local_service,
                  platform_family: 'rhel',
@@ -34,27 +34,34 @@ class Chef
       end
 
       #
-      # Generate the `/etc/default/dnsmasq` file for the service.
+      # Generate the `/etc/default/dnsmasq` file for the service and patch it
+      # into the Systemd service config.
       #
       action :create do
         super()
         execute 'systemctl daemon-reload' do
           action :nothing
         end
-        file '/usr/lib/systemd/system/dnsmasq.service' do
-          content lazy {
-            orig = ::File.read('/usr/lib/systemd/system/dnsmasq.service')
-            lines = orig.lines
-            idx = lines.index { |l| l.start_with?('ExecStart') }
-            lines.insert(idx, "EnvironmentFile=/etc/default/dnsmasq\n")
-            lines.join
+        directory '/etc/systemd/system/dnsmasq.service.d'
+        file '/etc/systemd/system/dnsmasq.service.d/local.conf' do
+          content <<-EOH.gsub(/^ {12}/, '').strip
+            [Service]
+            EnvironmentFile=/etc/default/dnsmasq
 
-            idx = lines.index do |l|
-              l.strip == 'ExecStart=/usr/sbin/dnsmasq -k'
-            end
-            lines[idx] = lines[idx].strip + " $DNSMASQ_OPTS\n" if idx
-            lines.join
-          }
+            ExecStartPre=/bin/mkdir -p /var/run/dnsmasq
+            ExecStartPre=/bin/cp /etc/resolv.conf /var/run/dnsmasq/resolv.conf
+
+            ExecStart=
+            ExecStart=/usr/sbin/dnsmasq -k -r /var/run/dnsmasq/resolv.conf -x /var/run/dnsmasq/dnsmasq.pid $DNSMASQ_OPTS
+
+            ExecStartPost=/bin/cp /var/run/dnsmasq/resolv.conf /var/run/dnsmasq/resolv.conf.new
+            ExecStartPost=/bin/sed -i '/^nameserver/d' /var/run/dnsmasq/resolv.conf.new
+            ExecStartPost=/bin/sh -c 'echo nameserver 127.0.0.1 >> /var/run/dnsmasq/resolv.conf.new'
+            ExecStartPost=/bin/cp /var/run/dnsmasq/resolv.conf.new /etc/resolv.conf
+
+            ExecStop=/bin/cp /var/run/dnsmasq/resolv.conf /etc/resolv.conf
+            ExecStop=/bin/rm -rf /var/run/dnsmasq
+          EOH
           notifies :run, 'execute[systemctl daemon-reload]', :immediately
         end
       end
@@ -64,7 +71,10 @@ class Chef
       #
       action :remove do
         super()
-        file('/usr/lib/systemd/system/dnsmasq.service') { action :delete }
+        file '/etc/systemd/system/dnsmasq.service.d/local.conf' do
+          action :delete
+        end
+        directory('/etc/systemd/system/dnsmasq.service.d') { action :delete }
       end
     end
   end

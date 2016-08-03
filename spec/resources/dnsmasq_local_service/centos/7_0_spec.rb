@@ -12,43 +12,37 @@ describe 'resources::dnsmasq_local_service::centos::7_0' do
   it_behaves_like 'any RHEL platform'
 
   shared_examples_for 'systemd patching' do
-    before(:each) do
-      allow(File).to receive(:read).and_call_original
-      orig = <<-EOH.gsub(/^ +/, '')
-        [Unit]
-        Description=DNS caching server.
-        After=network.target
-
-        [Service]
-        ExecStart=/usr/sbin/dnsmasq -k
-
-        [Install]
-        WantedBy=multi-user.target
-      EOH
-      allow(File).to receive(:read)
-        .with('/usr/lib/systemd/system/dnsmasq.service').and_return(orig)
+    it 'creates the Dnsmasq service directory' do
+      d = '/etc/systemd/system/dnsmasq.service.d'
+      expect(chef_run).to create_directory(d)
     end
 
-    it 'patches the dnsmasq Systemd file' do
-      expected = <<-EOH.gsub(/^ +/, '')
-        [Unit]
-        Description=DNS caching server.
-        After=network.target
-
+    it 'creates the Dnsmasq service override file' do
+      expected = <<-EOH.gsub(/^ +/, '').strip
         [Service]
         EnvironmentFile=/etc/default/dnsmasq
-        ExecStart=/usr/sbin/dnsmasq -k $DNSMASQ_OPTS
 
-        [Install]
-        WantedBy=multi-user.target
+        ExecStartPre=/bin/mkdir -p /var/run/dnsmasq
+        ExecStartPre=/bin/cp /etc/resolv.conf /var/run/dnsmasq/resolv.conf
+
+        ExecStart=
+        ExecStart=/usr/sbin/dnsmasq -k -r /var/run/dnsmasq/resolv.conf -x /var/run/dnsmasq/dnsmasq.pid $DNSMASQ_OPTS
+
+        ExecStartPost=/bin/cp /var/run/dnsmasq/resolv.conf /var/run/dnsmasq/resolv.conf.new
+        ExecStartPost=/bin/sed -i '/^nameserver/d' /var/run/dnsmasq/resolv.conf.new
+        ExecStartPost=/bin/sh -c 'echo nameserver 127.0.0.1 >> /var/run/dnsmasq/resolv.conf.new'
+        ExecStartPost=/bin/cp /var/run/dnsmasq/resolv.conf.new /etc/resolv.conf
+
+        ExecStop=/bin/cp /var/run/dnsmasq/resolv.conf /etc/resolv.conf
+        ExecStop=/bin/rm -rf /var/run/dnsmasq
       EOH
-      expect(chef_run).to create_file('/usr/lib/systemd/system/dnsmasq.service')
-        .with(content: expected)
+      f = '/etc/systemd/system/dnsmasq.service.d/local.conf'
+      expect(chef_run).to create_file(f).with(content: expected)
     end
 
     it 'runs a daemon-reload' do
       expect(chef_run.execute('systemctl daemon-reload')).to do_nothing
-      expect(chef_run.file('/usr/lib/systemd/system/dnsmasq.service'))
+      expect(chef_run.file('/etc/systemd/system/dnsmasq.service.d/local.conf'))
         .to notify('execute[systemctl daemon-reload]').to(:run).immediately
     end
   end
@@ -68,8 +62,14 @@ describe 'resources::dnsmasq_local_service::centos::7_0' do
   context 'the :remove action' do
     include_context description
 
-    it 'deletes the Dnsmasq Systemd file' do
-      expect(chef_run).to delete_file('/usr/lib/systemd/system/dnsmasq.service')
+    it 'deletes the Dnsmasq service override file' do
+      expect(chef_run).to delete_file('/etc/systemd/system/dnsmasq.service.d/' \
+                                      'local.conf')
+    end
+
+    it 'deletes the Dnsmasq service directory' do
+      expect(chef_run).to delete_directory('/etc/systemd/system/' \
+                                           'dnsmasq.service.d')
     end
   end
 end

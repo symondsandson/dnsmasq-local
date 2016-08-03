@@ -25,7 +25,15 @@ describe 'dnsmasq-local::default::service' do
     end
   end
 
-  describe file('/run/resolvconf/resolv.conf') do
+  describe file('/run/resolvconf/resolv.conf'),
+      if: %w(ubuntu debian).include?(os[:family]) do
+    it 'is using localhost as the nameserver' do
+      expect(subject.content).to match(/^nameserver 127\.0\.0\.1$/)
+    end
+  end
+
+  describe file('/var/run/dnsmasq/resolv.conf.new'),
+      if: os[:family] == 'redhat' do
     it 'is using localhost as the nameserver' do
       expect(subject.content).to match(/^nameserver 127\.0\.0\.1$/)
     end
