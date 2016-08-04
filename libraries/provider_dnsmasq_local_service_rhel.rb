@@ -27,36 +27,6 @@ class Chef
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
     class DnsmasqLocalServiceRhel < DnsmasqLocalService
-      #
-      # Patch NetworkManager's config so it won't manage resolv.conf and we
-      # can patch Dnsmasq's service script to take ownership of it.
-      #
-      action :enable do
-        service 'NetworkManager' do
-          supports(status: true, restart: true)
-          action :nothing
-        end
-        file '/etc/NetworkManager/conf.d/20-dnsmasq.conf' do
-          content "[main]\ndns=none"
-          notifies :restart, 'service[NetworkManager]', :immediately
-        end
-        super()
-      end
-
-      #
-      # Delete the Dnsmasq conf file with NetworkManager.
-      #
-      action :disable do
-        super()
-        service 'NetworkManager' do
-          supports(status: true, restart: true)
-          action :nothing
-        end
-        file '/etc/NetworkManager/conf.d/20-dnsmasq.conf' do
-          action :delete
-          notifies :restart, 'service[NetworkManager]', :immediately
-        end
-      end
     end
   end
 end

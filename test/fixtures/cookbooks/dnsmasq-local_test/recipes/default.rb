@@ -4,7 +4,7 @@
 execute 'apt-get update' if node['platform_family'] == 'debian'
 
 if %w(docker lxc).include?(node['virtualization']['system']) &&
-    node['platform_family'] == 'debian'
+   node['platform_family'] == 'debian'
   # Fake out the Docker build and its immutable resolv.conf.
   directory '/var/lib/resolvconf'
   file '/var/lib/resolvconf/linkified'

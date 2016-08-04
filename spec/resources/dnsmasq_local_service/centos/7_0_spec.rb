@@ -12,6 +12,17 @@ describe 'resources::dnsmasq_local_service::centos::7_0' do
   it_behaves_like 'any RHEL platform'
 
   shared_examples_for 'systemd patching' do
+    it 'defines a NetworkManager service resource' do
+      expect(chef_run.service('NetworkManager')).to do_nothing
+    end
+
+    it 'drops off a Dnsmasq NetworkManager config' do
+      f = '/etc/NetworkManager/conf.d/20-dnsmasq.conf'
+      expect(chef_run).to create_file(f).with(content: "[main]\ndns=none")
+      expect(chef_run.file(f)).to notify('service[NetworkManager]')
+        .to(:restart).immediately
+    end
+
     it 'creates the Dnsmasq service directory' do
       d = '/etc/systemd/system/dnsmasq.service.d'
       expect(chef_run).to create_directory(d)
@@ -61,6 +72,17 @@ describe 'resources::dnsmasq_local_service::centos::7_0' do
 
   context 'the :remove action' do
     include_context description
+
+    it 'defines a NetworkManager service resource' do
+      expect(chef_run.service('NetworkManager')).to do_nothing
+    end
+
+    it 'deletes the Dnsmasq NetworkManager config' do
+      f = '/etc/NetworkManager/conf.d/20-dnsmasq.conf'
+      expect(chef_run).to delete_file(f)
+      expect(chef_run.file(f)).to notify('service[NetworkManager]')
+        .to(:restart).immediately
+    end
 
     it 'deletes the Dnsmasq service override file' do
       expect(chef_run).to delete_file('/etc/systemd/system/dnsmasq.service.d/' \
