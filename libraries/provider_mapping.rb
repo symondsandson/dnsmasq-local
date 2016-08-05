@@ -30,25 +30,48 @@ require_relative 'provider_dnsmasq_local_service_rhel_sysvinit'
 require_relative 'provider_dnsmasq_local_service_rhel_systemd'
 
 if Gem::Version.new(Chef::VERSION) < Gem::Version.new('12')
-  Chef::Platform.set(resource: :dnsmasq_local,
-                     provider: Chef::Provider::DnsmasqLocal)
-  Chef::Platform.set(resource: :dnsmasq_local_app,
-                     platform_family: 'debian',
-                     provider: Chef::Provider::DnsmasqLocalAppDebian)
-  Chef::Platform.set(resource: :dnsmasq_local_app,
-                     platform_family: 'rhel',
-                     provider: Chef::Provider::DnsmasqLocalAppRhel)
-  Chef::Platform.set(resource: :dnsmasq_local_config,
-                     provider: Chef::Provider::DnsmasqLocalConfig)
-  Chef::Platform.set(resource: :dnsmasq_local_service,
-                     platform_family: 'debian',
-                     provider: Chef::Provider::DnsmasqLocalServiceDebian)
-  Chef::Platform.set(resource: :dnsmasq_local_service,
-                     platform_family: 'rhel',
-                     platform_version: '< 7',
-                     provider: Chef::Provider::DnsmasqLocalServiceRhelSysvinit)
-  Chef::Platform.set(resource: :dnsmasq_local_service,
-                     platform_family: 'rhel',
-                     platform_version: '>= 7',
-                     provider: Chef::Provider::DnsmasqLocalServiceRhelSystemd)
+  Chef::Platform.set(
+    resource: :dnsmasq_local,
+    provider: Chef::Provider::DnsmasqLocal
+  )
+  [:ubuntu, :debian].each do |p|
+    Chef::Platform.set(
+      resource: :dnsmasq_local_app,
+      platform: p,
+      provider: Chef::Provider::DnsmasqLocalAppDebian
+    )
+  end
+  [:redhat, :centos, :scientific].each do |p|
+    Chef::Platform.set(
+      resource: :dnsmasq_local_app,
+      platform: p,
+      provider: Chef::Provider::DnsmasqLocalAppRhel
+    )
+  end
+  Chef::Platform.set(
+    resource: :dnsmasq_local_config,
+    provider: Chef::Provider::DnsmasqLocalConfig
+  )
+
+  [:ubuntu, :debian].each do |p|
+    Chef::Platform.set(
+      resource: :dnsmasq_local_service,
+      platform: p,
+      provider: Chef::Provider::DnsmasqLocalServiceDebian
+    )
+  end
+  [:redhat, :centos, :scientific].each do |p|
+    Chef::Platform.set(
+      resource: :dnsmasq_local_service,
+      platform: p,
+      platform_version: '< 7',
+      provider: Chef::Provider::DnsmasqLocalServiceRhelSysvinit
+    )
+    Chef::Platform.set(
+      resource: :dnsmasq_local_service,
+      platform: p,
+      platform_version: '>= 7',
+      provider: Chef::Provider::DnsmasqLocalServiceRhelSystemd
+    )
+  end
 end
