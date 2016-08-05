@@ -26,7 +26,7 @@ class Chef
     # A Dnsmasq package provider specific to RHEL platforms.
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
-    class DnsmasqLocalAppDebianRhel < DnsmasqLocalApp
+    class DnsmasqLocalAppRhel < DnsmasqLocalApp
       provides :dnsmasq_local_app, platform_family: 'rhel' if defined?(provides)
 
       #
