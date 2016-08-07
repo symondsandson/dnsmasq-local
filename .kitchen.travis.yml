@@ -38,9 +38,6 @@ platforms:
     driver:
       image: centos:6
       pid_one_command: /sbin/init
-      intermediate_instructions:
-        - RUN dpkg-divert --remove /sbin/initctl
-        - RUN ln -sf /sbin/initctl.distrib /sbin/initctl
   - name: ubuntu-14.04-chef-11
     driver:
       name: docker
