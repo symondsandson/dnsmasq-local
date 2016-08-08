@@ -34,5 +34,5 @@ suites:
             - 8.8.4.4
           address: /example.biz/127.0.0.1
         options:
-          bind_dynamic: true
+          all_servers: true
           bad_option: false

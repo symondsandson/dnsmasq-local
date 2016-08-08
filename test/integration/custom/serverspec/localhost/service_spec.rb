@@ -9,7 +9,7 @@ describe 'dnsmasq-local::custom::service' do
       expected = <<-EOH.gsub(/^ {8}/, '').strip
         # This file is managed by Chef.
         # Any changes to it will be overwritten.
-        DNSMASQ_OPTS='--bind-dynamic'
+        DNSMASQ_OPTS='--all-servers'
       EOH
       expect(subject.content).to eq(expected)
     end
