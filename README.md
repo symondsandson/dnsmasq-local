@@ -16,7 +16,7 @@ localhost-only improved DNS reliability.
 Requirements
 ============
 
-This cookbook currently supports Ubuntu only.
+This cookbook currently supports both Debian-based and RHEL-based platforms.
 
 At least for the time being, it supports Chef 11+, at the expense of some
 additional complexity to maintain backwards compatibility.
@@ -39,26 +39,35 @@ Attributes
 
 ***default***
 
+The config attribute hash defaults to empty and can be overridden with settings
+to be rendered out to Dnsmasq's .conf file:
+
     default['dnsmasq_local']['config'] = {}
 
-Any key+value can be set under this namespace and it will be merged into the
-default Dnsmasq config.
+Any option that contains a hyphen should be set as an attribute with an
+underscore:
 
-Any config key that contains a hyphen (e.g. `cache-size`) should be set in
-attributes with an underscore (e.g. `cache_size`).
+    default['dnsmasq_local']['config']['cache_size'] = 300
 
-Any Dnsmasq setting that is a boolean key with no value (e.g. `proxy_dnssec`)
-can be set to true or false to be enabled or disabled, respectively.
+Any option that is a boolean with no value can be set to true or false to be
+enabled or disabled:
 
-Any setting that can have multiple entries can be set as either an array
+    default['dnsmasq_local']['config']['proxy_dnssec'] = false
+
+Any option that can have multiple entries can be set as either an array
 (where all entries will be rendered in the config) or a hash (where entries
-set to false will not be rendered).
+set to false will not be rendered):
 
-    default['dnsmasq_local']['config'] = {}
+    default['dnsmasq_local']['config']['server'] = %w(8.8.8.8)
 
-Any key+value can be set under this namespace and it will be merged into the
-default Dnsmasq environment variables. Keys will be automatically upcased
-before being rendered into the final service config.
+    default['dnsmasq_local']['config']['server']['8.8.8.8'] = true
+
+The options attribute hash defaults to empty and can be overridden with
+command line options to run Dnsmasq with. The longform versions of switches
+must be used, with the same underscore and boolean rules as for the config: 
+
+    default['dnsmasq_local']['options']['bind_dynamic'] = true
+    default['dnsmasq_local']['options']['enable_dbus'] = 'com.example'
 
 Resources
 =========
@@ -71,7 +80,7 @@ Syntax:
 
     dnsmasq_local 'default' do
       config(cache_size: 0)
-      environment(dnsmasq_opts: '--bind-dynamic')
+      options(bind_dynamic: true)
       action :create
     end
 
@@ -84,11 +93,11 @@ Actions:
 
 Attributes:
 
-| Attribute   | Default    | Description                         |
-|-------------|------------|-------------------------------------|
-| config      | `nil`      | A Dnsmasq configuration hash        |
-| environment | `nil`      | A Dnsmasq environment variable hash |
-| action      | `:create`  | Action(s) to perform                |
+| Attribute | Default   | Description                         |
+|-----------|-----------|-------------------------------------|
+| config    | `nil`     | A Dnsmasq configuration hash        |
+| options   | `nil`     | A Dnsmasq command line options hash |
+| Action    | `:create` | Action(s) to perform                |
 
 ***dnsmasq_local_app***
 
@@ -105,13 +114,15 @@ Actions:
 | Action     | Description                   |
 |------------|-------------------------------|
 | `:install` | Install the Dnsmasq package   |
+| `:upgrade` | Upgrade the Dnsmasq package   |
 | `:remove`  | Uninstall the Dnsmasq package |
 
 Attributes:
 
-| Attribute | Default    | Description                         |
-|-----------|------------|-------------------------------------|
-| action    | `:install` | Action(s) to perform                |
+| Attribute | Default    | Description                               |
+|-----------|------------|-------------------------------------------|
+| version   | `nil`      | Install a specific version of the package |
+| action    | `:install` | Action(s) to perform                      |
 
 ***dnsmasq_local_config***
 
@@ -163,38 +174,33 @@ A resource for the managing the Dnsmasq service.
 Syntax:
 
     dnsmasq_local_service 'default' do
-      environment(config_dir: '/tmp/dnsmasq')
-      dnsmasq_opts '--bind-dynamic'
-      action [:enable, :start]
+      options(bind_dynamic: true)
+      enable_dbus 'com.example'
+      action [:create, :enable, :start]
     end
 
 Actions:
 
-| Action     | Description         |
-|------------|---------------------|
-| `:enable`  | Enable the service  |
-| `:disable` | Disable the service |
-| `:start`   | Start the service   |
-| `:stop`    | Stop the service    |
-| `:restart` | Restart the service |
+| Action     | Description                                        |
+|------------|----------------------------------------------------|
+| `:create`  | Set up `/etc/default/dnsmasq` and any init patches |
+| `:remove`  | Remove `/etc/default/dnsmasq` and any init patches |
+| `:enable`  | Enable the service                                 |
+| `:disable` | Disable the service                                |
+| `:start`   | Start the service                                  |
+| `:stop`    | Stop the service                                   |
+| `:restart` | Restart the service                                |
 
 Attributes:
 
-| Attribute   | Default               | Description                    |
-|-------------|-----------------------|--------------------------------|
-| environment | See below             | A complete environment hash \* |
-| config_dir  | `'/etc/dnsmasq.d...'` | Point at Dnsmasq's .d dir      |
-| enabled     | 1                     | Enable Dnsmasq                 |
-| \*\*        | `nil`                 | Varies                         |
-| action      | `[:enable, :start]`   | Action(s) to perform           |
+| Attribute | Default                      | Description                |
+|-----------|------------------------------|----------------------------|
+| options   | See below                    | A complete options hash \* |
+| \*        | `nil`                        | Varies                     |
+| action    | `[:create, :enable, :start]` | Action(s) to perform       |
 
-\* An environment attribute that is passed in will override the entirety of the
-  default environment, whereas individual attributes passed in will be merged
-  with it.
-
-\*\* Any unrecognized attribute that is passed in will be assumed to be a
-     valid Dnsmasq environment variable and rendered out to its service
-     definition.
+\* Command line options can be passed in either as one complete `options` hash,
+   or as individual attribute calls for each option.
 
 Providers
 =========
@@ -205,15 +211,41 @@ Provider that wraps each of the Dnsmasq component resources.
 
 ***Chef::Provider::DnsmasqLocalApp***
 
-Provider for managing the Dnsmasq app packages.
+Parent provider for managing Dnsmasq app packages.
+
+***Chef::Provider::DnsmasqLocalAppDebian***
+
+The Ubuntu/Debian implementation of the app provider.
+
+***Chef::Provider::DnsmasqLocalAppRhel***
+
+The RHEL implementation of the app provider.
+
+***Chef::Provider::DnsmasqLocalConfig***
+
+Platform-agnostic provider for managing Dnsmasq config files.
 
 ***Chef::Provider::DnsmasqLocalService***
 
-Provider for managing Dnsmasq config files.
+Parent provider for managing the Dnsmasq service.
 
-***Chef::Provider::DnsmasqLocalService***
+***Chef::Provider::DnsmasqLocalServiceDebian***
 
-Provider for managing the Dnsmasq service.
+The Ubuntu/Debian implementation of the service provider. As of 16.04, Ubuntu
+has yet to switch Dnsmasq to either Upstart or Systemd, so only the single
+provider is needed.
+
+***Chef::Provider::DnsmasqLocalServiceRhelSystemd***
+
+The RHEL >= 7 Systemd implementation of the service provider. Also patches the
+Systemd config to pass the desired command line options to Dnsmasq via
+`/etc/default/dnsmasq`.
+
+***Chef::Provider::DnsmasqLocalServiceRhelSysvinit***
+
+The RHEL < 7 init implementation of the service provider. Also patches the
+init script to pass the desired command line options to Dnsmasq via
+`/etc/default/dnsmasq`.
 
 Contributing
 ============

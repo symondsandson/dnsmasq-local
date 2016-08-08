@@ -8,6 +8,9 @@ provisioner:
 platforms:
   - name: ubuntu-16.04
   - name: ubuntu-14.04
+  - name: debian-8.4
+  - name: centos-7.2
+  - name: centos-6.7
   - name: ubuntu-14.04-chef-11
     driver:
       box: bento/ubuntu-14.04
@@ -30,5 +33,6 @@ suites:
             - 8.8.8.8
             - 8.8.4.4
           address: /example.biz/127.0.0.1
-        environment:
-          dnsmasq_opts: '--bind-dynamic'
+        options:
+          all_servers: true
+          bad_option: false

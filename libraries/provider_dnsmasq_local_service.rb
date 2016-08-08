@@ -1,4 +1,5 @@
-# Encoding: UTF-8
+# encoding: utf-8
+# frozen_string_literal: true
 #
 # Cookbook Name:: dnsmasq-local
 # Library:: provider_dnsmasq_local_service
@@ -29,8 +30,6 @@ class Chef
     class DnsmasqLocalService < LWRPBase
       use_inline_resources
 
-      provides :dnsmasq_local_service if defined?(provides)
-
       #
       # WhyRun is supported by this provider
       #
@@ -44,22 +43,27 @@ class Chef
       # Generate the `/etc/default/dnsmasq` file for the service.
       #
       action :create do
-        merged_env = new_resource.environment.merge(
-          new_resource.state.select { |k, v| k != :environment && !v.nil? }
+        merged_options = new_resource.options.merge(
+          new_resource.state.select { |k, v| k != :options && !v.nil? }
         )
         file '/etc/default/dnsmasq' do
-          c = <<-EOH.gsub(/^ +/, '')
+          header = <<-EOH.gsub(/^ +/, '')
             # This file is managed by Chef.
             # Any changes to it will be overwritten.
           EOH
-          c << Hash[merged_env.sort].map { |k, v| "#{k.upcase}='#{v}'" }
-               .join("\n")
-          content c
+          opts_str = merged_options.map do |k, v|
+            if v == true
+              "--#{k.to_s.tr('_', '-')}"
+            elsif v
+              "--#{k.to_s.tr('_', '-')}=#{v}"
+            end
+          end.compact.join(' ')
+          content(header + "DNSMASQ_OPTS='#{opts_str}'")
         end
       end
 
       #
-      # Clean up the service files that are managed by Chef.
+      # Clean up the defaults file.
       #
       action :remove do
         file('/etc/default/dnsmasq') { action :delete }

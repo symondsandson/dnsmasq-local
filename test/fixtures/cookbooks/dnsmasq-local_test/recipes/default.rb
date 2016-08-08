@@ -1,16 +1,27 @@
-# Encoding: UTF-8
+# encoding: utf-8
+# frozen_string_literal: true
 
-execute 'apt-get update'
+execute 'apt-get update' if node['platform_family'] == 'debian'
 
 if %w(docker lxc).include?(node['virtualization']['system'])
-  # Fake out the Docker build and its immutable resolv.conf.
-  directory '/var/lib/resolvconf'
-  file '/var/lib/resolvconf/linkified'
+  case node['platform_family']
+  when 'debian'
+    # Fake out the Docker build and its immutable resolv.conf.
+    directory '/var/lib/resolvconf'
+    file '/var/lib/resolvconf/linkified'
+    package 'apt-utils'
+    package 'resolvconf'
 
-  %w(apt-utils resolvconf).each { |p| package p }
-
-  service 'resolvconf' do
-    action [:enable, :start]
+    service 'resolvconf' do
+      action [:enable, :start]
+    end
+  when 'rhel'
+    if node['platform_version'].to_i >= 7
+      package 'NetworkManager'
+      service 'NetworkManager' do
+        action [:enable, :start]
+      end
+    end
   end
 end
 

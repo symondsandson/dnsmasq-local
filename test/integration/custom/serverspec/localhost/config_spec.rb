@@ -1,8 +1,15 @@
-# Encoding: UTF-8
+# encoding: utf-8
+# frozen_string_literal: true
 
 require_relative '../spec_helper'
 
 describe 'dnsmasq-local::custom::config' do
+  describe file('/etc/dnsmasq.conf') do
+    it 'is pointed at the .d config dir' do
+      expect(subject.content).to match(%r{^conf-dir=/etc/dnsmasq\.d$})
+    end
+  end
+
   describe file('/etc/dnsmasq.d/dns.conf') do
     it 'is listening on the local interface only' do
       expect(subject.content).to match(/^interface=$/)

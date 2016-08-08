@@ -1,4 +1,5 @@
-# Encoding: UTF-8
+# encoding: utf-8
+# frozen_string_literal: true
 #
 # Cookbook Name:: dnsmasq-local
 # Library:: resource_dnsmasq_local
@@ -36,9 +37,9 @@ class Chef
       attribute :config, kind_of: Hash, default: {}
 
       #
-      # Supporting passing dnsmasq environment variables as a hash.
+      # Support passing command line options for dnsmasq as a hash.
       #
-      attribute :environment, kind_of: Hash, default: {}
+      attribute :options, kind_of: Hash, default: {}
     end
   end
 end

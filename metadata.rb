@@ -1,5 +1,5 @@
-# Encoding: UTF-8
-#
+# encoding: utf-8
+# frozen_string_literal: true
 
 name 'dnsmasq-local'
 maintainer 'Jonathan Hartman'
@@ -17,5 +17,9 @@ if respond_to?(:issues_url)
 end
 
 supports 'ubuntu'
+supports 'debian'
+supports 'redhat'
+supports 'centos'
+supports 'scientific'
 
 conflicts 'dnsmasq'

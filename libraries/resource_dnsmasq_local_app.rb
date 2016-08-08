@@ -1,4 +1,5 @@
-# Encoding: UTF-8
+# encoding: utf-8
+# frozen_string_literal: true
 #
 # Cookbook Name:: dnsmasq-local
 # Library:: resource_dnsmasq_local_app
@@ -27,8 +28,13 @@ class Chef
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
     class DnsmasqLocalApp < LWRPBase
       self.resource_name = :dnsmasq_local_app
-      actions :install, :remove
+      actions :install, :upgrade, :remove
       default_action :install
+
+      #
+      # Allow the user to specify a package version to install.
+      #
+      attribute :version, kind_of: String
     end
   end
 end

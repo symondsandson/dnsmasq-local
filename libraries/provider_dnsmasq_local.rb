@@ -1,4 +1,5 @@
-# Encoding: UTF-8
+# encoding: utf-8
+# frozen_string_literal: true
 #
 # Cookbook Name:: dnsmasq-local
 # Library:: provider_dnsmasq_local
@@ -52,7 +53,7 @@ class Chef
           notifies :restart, "dnsmasq_local_service[#{new_resource.name}]"
         end
         dnsmasq_local_service new_resource.name do
-          new_resource.environment.each { |k, v| send(k, v) }
+          new_resource.options.each { |k, v| send(k, v) }
           notifies :restart, "dnsmasq_local_service[#{new_resource.name}]"
         end
       end

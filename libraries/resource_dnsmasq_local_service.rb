@@ -1,4 +1,5 @@
-# Encoding: UTF-8
+# encoding: utf-8
+# frozen_string_literal: true
 #
 # Cookbook Name:: dnsmasq-local
 # Library:: resource_dnsmasq_local_service
@@ -33,20 +34,30 @@ class Chef
       default_action [:create, :enable, :start]
 
       #
-      # Set up a default hash of environment variables that a user can
-      # override in its entirety by passing in a new one. Every key set will be
-      # upcased and written out to `/etc/default/dnsmasq` on Ubuntu nodes.
+      # Allow the user to pass in either hash of command-line options to be
+      # passed to dnsmasq. This is necessary because there are some options
+      # that can only be set as switches and have no equivalent that can live
+      # in a dnsmasq.conf.
       #
-      attribute :environment,
-                kind_of: Hash,
-                default: {
-                  enabled: 1,
-                  config_dir: '/etc/dnsmasq.d,.dpkg-dist,.dpkg-old,.dpkg-new'
-                }
+      # Following Chef attribute style, options should be passed in with
+      # underscores in place of dashes and will be converted by the provider,
+      # e.g.:
+      #
+      #   dnsmasq_local_service 'default' do
+      #     options(bind_dynamic: true, all_servers: true)
+      #   end
+      #
+      #   dnsmasq_local_service 'default' do
+      #     options(enable_dbus: 'uk.org.thekelleys.dnsmasq')
+      #   end
+      #
+      # Only the longform names of these switches are supported.
+      #
+      attribute :options, kind_of: Hash, default: {}
 
       #
       # Allow individual attributes to be fed in and merged with the default
-      # environment without blowing away the entire thing.
+      # options without blowing away the entire hash.
       #
       # (see Chef::Resource#method_missing)
       #
