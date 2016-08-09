@@ -34,20 +34,10 @@ class Chef
       end
 
       #
-      # Tell NetworkManager to stop managing DNS, generate the
-      # `/etc/default/dnsmasq` file and patch usage of it into the Systemd
-      # unit.
+      # Generate the `/etc/default/dnsmasq` file and patch usage of it into the
+      # Systemd unit.
       #
       action :create do
-        service 'NetworkManager' do
-          supports(status: true, restart: true)
-          action :nothing
-        end
-        file '/etc/NetworkManager/conf.d/20-dnsmasq.conf' do
-          content "[main]\ndns=none"
-          notifies :restart, 'service[NetworkManager]', :immediately
-        end
-
         super()
 
         execute 'systemctl daemon-reload' do
@@ -78,23 +68,14 @@ class Chef
       end
 
       #
-      # Delete the NetworkManager config and clean up the service files that
-      # are managed by Chef.
+      # Clean up the service files that are managed by Chef.
       #
       action :remove do
-        super()
-        service 'NetworkManager' do
-          supports(status: true, restart: true)
-          action :nothing
-        end
-        file '/etc/NetworkManager/conf.d/20-dnsmasq.conf' do
-          action :delete
-          notifies :restart, 'service[NetworkManager]', :immediately
-        end
         file '/etc/systemd/system/dnsmasq.service.d/local.conf' do
           action :delete
         end
         directory('/etc/systemd/system/dnsmasq.service.d') { action :delete }
+        super()
       end
     end
   end

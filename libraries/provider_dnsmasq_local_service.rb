@@ -19,6 +19,7 @@
 # limitations under the License.
 #
 
+require 'chef/mixin/shell_out'
 require 'chef/provider/lwrp_base'
 require_relative 'resource_dnsmasq_local_service'
 
@@ -28,6 +29,8 @@ class Chef
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
     class DnsmasqLocalService < LWRPBase
+      include Chef::Mixin::ShellOut
+
       use_inline_resources
 
       #
@@ -40,9 +43,21 @@ class Chef
       end
 
       #
-      # Generate the `/etc/default/dnsmasq` file for the service.
+      # Tell NetworkManager to relinquish control of Dnsmasq, if applicable,
+      # and generate the `/etc/default/dnsmasq` file for the service.
       #
       action :create do
+        if shell_out('pgrep NetworkManager').exitstatus.zero?
+          service 'NetworkManager' do
+            supports(status: true, restart: true)
+            action :nothing
+          end
+          directory '/etc/NetworkManager/conf.d'
+          file '/etc/NetworkManager/conf.d/20-dnsmasq.conf' do
+            content "[main]\ndns=none"
+            notifies :restart, 'service[NetworkManager]', :immediately
+          end
+        end
         merged_options = new_resource.options.merge(
           new_resource.state.select { |k, v| k != :options && !v.nil? }
         )
@@ -63,10 +78,21 @@ class Chef
       end
 
       #
-      # Clean up the defaults file.
+      # Clean up the NetworkManager config, if appilcable, and the defaults
+      # file.
       #
       action :remove do
         file('/etc/default/dnsmasq') { action :delete }
+        if shell_out('pgrep NetworkManager').exitstatus.zero?
+          service 'NetworkManager' do
+            supports(status: true, restart: true)
+            action :nothing
+          end
+          file '/etc/NetworkManager/conf.d/20-dnsmasq.conf' do
+            action :delete
+            notifies :restart, 'service[NetworkManager]', :immediately
+          end
+        end
       end
 
       #
