@@ -1,6 +1,9 @@
 Dnsmasq Local Cookbook CHANGELOG
 ================================
 
+Unreleased
+----------
+
 v1.0.0 (2016-08-09)
 -------------------
 - Add support for RHEL and RHEL-alike platforms
