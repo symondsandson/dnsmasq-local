@@ -1,12 +1,13 @@
 Dnsmasq Local Cookbook CHANGELOG
 ================================
 
-Unreleased
-----------
-- Add support RHEL and RHEL-alike platforms
+v1.0.0 (2016-08-09)
+-------------------
+- Add support for RHEL and RHEL-alike platforms
 - Replace the "environment" attribute/property with command line "options"
 - Add an :upgrade action to the dnsmasq_local_app resource
 - Add a "version" attribute to the dnsmasq_local_app resource
+- Bypass NetworkManager's Dnsmasq management if it's running
 
 v0.5.0 (2016-07-26)
 -------------------
