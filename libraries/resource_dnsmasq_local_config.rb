@@ -42,7 +42,6 @@ class Chef
       #   * Disable caching
       #   * Do not create DNS for entries in /etc/hosts
       #   * Bind only to the interfaces being listened on
-      #   * Proxy DNSSEC, when available
       #   * Use a static reply port instead of randomly generating one for each
       #     query. This does pose a security risk for publicly-exposed servers
       #     (Don't run this there!), but ensures the return port will always
@@ -59,7 +58,6 @@ class Chef
                   cache_size: 0,
                   no_hosts: true,
                   bind_interfaces: true,
-                  proxy_dnssec: true,
                   query_port: 0
                 }
 

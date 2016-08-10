@@ -20,7 +20,6 @@ shared_context 'resources::dnsmasq_local' do
               cache_size: 0,
               no_hosts: true,
               bind_interfaces: true,
-              proxy_dnssec: true,
               query_port: 0
             }
           }.merge(config.to_h)
