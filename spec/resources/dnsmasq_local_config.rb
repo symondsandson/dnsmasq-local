@@ -39,7 +39,6 @@ shared_context 'resources::dnsmasq_local_config' do
             cache-size=0
             interface=
             no-hosts
-            proxy-dnssec
             query-port=0
           EOH
           expect(chef_run).to create_file('/etc/dnsmasq.d/dns.conf')
@@ -96,7 +95,6 @@ shared_context 'resources::dnsmasq_local_config' do
             cache-size=0
             example=elpmaxe
             interface=docker0
-            proxy-dnssec
             query-port=0
             server=8.8.8.8
             server=8.8.4.4
@@ -166,7 +164,6 @@ shared_context 'resources::dnsmasq_local_config' do
             cache-size=0
             example=elpmaxe
             interface=docker0
-            proxy-dnssec
             query-port=0
             server=8.8.8.8
             server=8.8.4.4

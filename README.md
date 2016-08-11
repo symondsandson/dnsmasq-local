@@ -52,7 +52,7 @@ underscore:
 Any option that is a boolean with no value can be set to true or false to be
 enabled or disabled:
 
-    default['dnsmasq_local']['config']['proxy_dnssec'] = false
+    default['dnsmasq_local']['config']['proxy_dnssec'] = true
 
 Any option that can have multiple entries can be set as either an array
 (where all entries will be rendered in the config) or a hash (where entries
@@ -154,7 +154,6 @@ Attributes:
 | cache_size      | 0          | Disable caching
 | no_hosts        | true       | Do not DNSify `/etc/hosts`            |
 | bind_interfaces | true       | Bind only to listening interfaces     |
-| proxy_dnssec    | true       | Proxy DNSSEC, when available          |
 | query_port      | 0          | Use a static, ephemeral return port   |
 | \*\*            | `nil`      | Varies                                |
 | action          | `:create`  | Action(s) to perform                  |
