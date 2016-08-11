@@ -1,8 +1,9 @@
 Dnsmasq Local Cookbook CHANGELOG
 ================================
 
-Unreleased
-----------
+v1.1.0 (2016-08-11)
+-------------------
+- Remove 'proxy-dnssec' as a default setting
 
 v1.0.0 (2016-08-09)
 -------------------
