@@ -3,6 +3,7 @@ Dnsmasq Local Cookbook CHANGELOG
 
 Unreleased
 ----------
+- Drop Chef 11 compatibility, test against Chef 13 and 12
 
 v1.1.0 (2016-08-11)
 -------------------
