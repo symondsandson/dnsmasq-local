@@ -1,5 +1,6 @@
 # encoding: utf-8
 # frozen_string_literal: true
+
 #
 # Cookbook Name:: dnsmasq-local
 # Library:: resource_dnsmasq_local
@@ -19,27 +20,56 @@
 # limitations under the License.
 #
 
-require 'chef/resource/lwrp_base'
+require 'chef/resource'
 
 class Chef
   class Resource
     # A main Chef resource for dnsmasq installation and configuration.
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
-    class DnsmasqLocal < LWRPBase
-      self.resource_name = :dnsmasq_local
-      actions :create, :remove
+    class DnsmasqLocal < Resource
+      provides :dnsmasq_local
+
       default_action :create
 
       #
       # Support passing a dnsmasq config in as one big (or small) hash.
       #
-      attribute :config, kind_of: Hash, default: {}
+      property :config, Hash, default: {}
 
       #
       # Support passing command line options for dnsmasq as a hash.
       #
-      attribute :options, kind_of: Hash, default: {}
+      property :options, Hash, default: {}
+
+      #
+      # Install and configure Dnsmasq. Drop in the config first so DNS
+      # doesn't break in the event of an unusable default config.
+      #
+      action :create do
+        dnsmasq_local_config new_resource.name do
+          new_resource.config.each { |k, v| send(k, v) }
+          notifies :restart, "dnsmasq_local_service[#{new_resource.name}]"
+        end
+        dnsmasq_local_app new_resource.name do
+          notifies :restart, "dnsmasq_local_service[#{new_resource.name}]"
+        end
+        dnsmasq_local_service new_resource.name do
+          new_resource.options.each { |k, v| send(k, v) }
+          notifies :restart, "dnsmasq_local_service[#{new_resource.name}]"
+        end
+      end
+
+      #
+      # Uninstall Dnsmasq and any configs.
+      #
+      action :remove do
+        dnsmasq_local_service new_resource.name do
+          action %i[stop disable remove]
+        end
+        dnsmasq_local_config(new_resource.name) { action :remove }
+        dnsmasq_local_app(new_resource.name) { action :remove }
+      end
     end
   end
 end

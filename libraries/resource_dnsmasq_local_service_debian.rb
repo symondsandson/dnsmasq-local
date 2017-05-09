@@ -1,8 +1,9 @@
 # encoding: utf-8
-# frozen_string_literal: true#
+# frozen_string_literal: true
 
+#
 # Cookbook Name:: dnsmasq-local
-# Library:: provider_dnsmasq_local_app_rhel
+# Library:: resource_dnsmasq_local_service_debian
 #
 # Copyright 2016, Socrata, Inc.
 #
@@ -19,22 +20,15 @@
 # limitations under the License.
 #
 
-require_relative 'provider_dnsmasq_local_app'
+require_relative 'resource_dnsmasq_local_service'
 
 class Chef
-  class Provider
-    # A Dnsmasq package provider specific to RHEL platforms.
+  class Resource
+    # A Chef resource for Debian's Dnsmasq service specifics.
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
-    class DnsmasqLocalAppRhel < DnsmasqLocalApp
-      provides :dnsmasq_local_app, platform_family: 'rhel' if defined?(provides)
-
-      #
-      # Remove the Dnsmasq package.
-      #
-      action :remove do
-        package('dnsmasq') { action :remove }
-      end
+    class DnsmasqLocalServiceDebian < DnsmasqLocalService
+      provides :dnsmasq_local_service, platform_family: 'debian'
     end
   end
 end

@@ -1,8 +1,9 @@
 # encoding: utf-8
 # frozen_string_literal: true
+
 #
 # Cookbook Name:: dnsmasq-local
-# Library:: provider_dnsmasq_local_app_debian
+# Library:: resource_dnsmasq_local_app_debian
 #
 # Copyright 2016, Socrata, Inc.
 #
@@ -19,17 +20,15 @@
 # limitations under the License.
 #
 
-require_relative 'provider_dnsmasq_local_app'
+require_relative 'resource_dnsmasq_local_app'
 
 class Chef
-  class Provider
-    # A Dnsmasq package provider specific to Debian platforms.
+  class Resource
+    # A Dnsmasq package resource specific to Debian platforms.
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
     class DnsmasqLocalAppDebian < DnsmasqLocalApp
-      if defined?(provides)
-        provides :dnsmasq_local_app, platform_family: 'debian'
-      end
+      provides :dnsmasq_local_app, platform_family: 'debian'
 
       #
       # Force APT to leave the Chef-generated config file in place.

@@ -1,8 +1,9 @@
 # encoding: utf-8
 # frozen_string_literal: true
+
 #
 # Cookbook Name:: dnsmasq-local
-# Library:: provider_dnsmasq_local_service_rhel_systemd
+# Library:: resource_dnsmasq_local_service_rhel_systemd
 #
 # Copyright 2016, Socrata, Inc.
 #
@@ -19,19 +20,17 @@
 # limitations under the License.
 #
 
-require_relative 'provider_dnsmasq_local_service_rhel'
+require_relative 'resource_dnsmasq_local_service_rhel'
 
 class Chef
-  class Provider
-    # A Chef provider for Systemd RHEL services.
+  class Resource
+    # A Chef resource for Systemd RHEL services.
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
     class DnsmasqLocalServiceRhelSystemd < DnsmasqLocalServiceRhel
-      if defined?(provides)
-        provides :dnsmasq_local_service,
-                 platform_family: 'rhel',
-                 platform_version: '>= 7'
-      end
+      provides :dnsmasq_local_service,
+               platform_family: 'rhel',
+               platform_version: '>= 7'
 
       #
       # Generate the `/etc/default/dnsmasq` file and patch usage of it into the

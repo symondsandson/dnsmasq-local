@@ -1,5 +1,6 @@
 # encoding: utf-8
 # frozen_string_literal: true
+
 #
 # Cookbook Name:: dnsmasq-local
 # Library:: resource_dnsmasq_local_config
@@ -19,23 +20,22 @@
 # limitations under the License.
 #
 
-require 'chef/resource/lwrp_base'
+require 'chef/resource'
 
 class Chef
   class Resource
     # A Chef resource for generating Dnsmasq configs.
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
-    class DnsmasqLocalConfig < LWRPBase # rubocop:disable Style/Documentation
-      self.resource_name = :dnsmasq_local_config
+    class DnsmasqLocalConfig < Resource
+      provides :dnsmasq_local_config
 
-      actions :create, :remove
       default_action :create
 
       state_attrs :config
 
       #
-      # Set up a default config attribute hash that can overridden in its
+      # Set up a default config property hash that can overridden in its
       # entirety by the user passing in a new one. The default config will:
       #
       #   * Listen only on the loopback interface
@@ -51,8 +51,8 @@ class Chef
       # we accept them here with underscores and will translate them before
       # rendering the final config file.
       #
-      attribute :config,
-                kind_of: Hash,
+      property :config,
+                Hash,
                 default: {
                   interface: '',
                   cache_size: 0,
@@ -62,7 +62,7 @@ class Chef
                 }
 
       #
-      # Allow individual attributes to be fed in so that they're merged with
+      # Allow individual properties to be fed in so that they're merged with
       # the default config but don't totally blow it away.
       #
       # (see Chef::Resource#method_missing)
@@ -87,15 +87,71 @@ class Chef
       end
 
       #
-      # Add a newly-declared attribute into the list of desired state
-      # attributes to account for the fact that Chef 12 defaults this to true
-      # while 11 defaults it to false.
+      # Create Dnsmasq's config directory and render a dns.conf config file
+      # in it.
       #
-      # @param attr [Symbol] the new attribute to add to the list of state ones
+      action :create do
+        file '/etc/dnsmasq.conf' do
+          content <<-EOH.gsub(/^ +/, '').strip
+            # This file is managed by Chef.
+            # Any changes to it will be overwritten.
+            conf-dir=/etc/dnsmasq.d
+          EOH
+        end
+        directory '/etc/dnsmasq.d'
+        merged_config = new_resource.config.merge(
+          new_resource.state.select { |k, v| k != :config && !v.nil? }
+        )
+        file '/etc/dnsmasq.d/dns.conf' do
+          content config_body_for(merged_config)
+        end
+      end
+
       #
-      def add_state_attr(attr)
-        new_attrs = (self.class.state_attrs << attr).uniq
-        self.class.state_attrs(*new_attrs)
+      # Delete Dnsmasq's config directory.
+      #
+      action :remove do
+        directory '/etc/dnsmasq.d' do
+          recursive true
+          action :delete
+        end
+      end
+
+      #
+      # Take a config hash and turn it into a proper Dnsmasq config file body.
+      #
+      # @param config [Hash] a config hash
+      #
+      # @return [String] a config file body
+      #
+      def config_body_for(config)
+        res = <<-EOH.gsub(/^ +/, '')
+          # This file is managed by Chef.
+          # Any changes to it will be overwritten.
+        EOH
+        res << Hash[config.sort].map { |k, v| config_for(k, v) }.compact
+               .join("\n")
+      end
+
+      #
+      # Take a config key and value and return the dnsmasq.conf-compatible
+      # string representation of them.
+      #
+      # @param key [Symbol, String] the dnsmasq config key
+      # @param val [TrueClass, FalseClass, String, Fixnum, Array] the value(s)
+      #
+      # @return [String, NilClass] the rendered config string or nil for an
+      #                            empty one
+      #
+      def config_for(key, val)
+        case val
+        when TrueClass, FalseClass then key.to_s.tr('_', '-') if val
+        when String, Fixnum then "#{key.to_s.tr('_', '-')}=#{val}"
+        when Array then val.map { |v| config_for(key, v) }.join("\n")
+        when Hash then config_for(key, val.keys.select { |k| val[k] })
+        else raise(Exceptions::ValidationFailed,
+                   "Invalid: '#{key}' => '#{val}'")
+        end
       end
     end
   end

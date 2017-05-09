@@ -4,6 +4,7 @@ Dnsmasq Local Cookbook CHANGELOG
 Unreleased
 ----------
 - Drop Chef 11 compatibility, test against Chef 13 and 12
+- Convert all the HWRPs to Chef custom resources
 
 v1.1.0 (2016-08-11)
 -------------------

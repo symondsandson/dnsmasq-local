@@ -1,5 +1,6 @@
 # encoding: utf-8
 # frozen_string_literal: true
+
 #
 # Cookbook Name:: dnsmasq-local
 # Library:: resource_dnsmasq_local_app
@@ -19,22 +20,36 @@
 # limitations under the License.
 #
 
-require 'chef/resource/lwrp_base'
+require 'chef/resource'
 
 class Chef
   class Resource
     # A Chef resource for managing the Dnsmasq package.
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
-    class DnsmasqLocalApp < LWRPBase
-      self.resource_name = :dnsmasq_local_app
-      actions :install, :upgrade, :remove
+    class DnsmasqLocalApp < Resource
       default_action :install
 
       #
       # Allow the user to specify a package version to install.
       #
-      attribute :version, kind_of: String
+      property :version, String
+
+      #
+      # Install the Dnsmasq package.
+      #
+      action :install do
+        package 'dnsmasq' do
+          version new_resource.version unless new_resource.version.nil?
+        end
+      end
+
+      #
+      # Upgrade the Dnsmasq package.
+      #
+      action :upgrade do
+        package('dnsmasq') { action :upgrade }
+      end
     end
   end
 end

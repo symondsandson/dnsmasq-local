@@ -1,8 +1,8 @@
 # encoding: utf-8
-# frozen_string_literal: true
-#
+# frozen_string_literal: true#
+
 # Cookbook Name:: dnsmasq-local
-# Library:: provider_dnsmasq_local_app
+# Library:: resource_dnsmasq_local_app_rhel
 #
 # Copyright 2016, Socrata, Inc.
 #
@@ -19,39 +19,21 @@
 # limitations under the License.
 #
 
-require 'chef/provider/lwrp_base'
+require_relative 'resource_dnsmasq_local_app'
 
 class Chef
-  class Provider
-    # A Chef provider for managing the Dnsmasq package.
+  class Resource
+    # A Dnsmasq package resouce specific to RHEL platforms.
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
-    class DnsmasqLocalApp < LWRPBase
-      use_inline_resources
+    class DnsmasqLocalAppRhel < DnsmasqLocalApp
+      provides :dnsmasq_local_app, platform_family: 'rhel'
 
       #
-      # WhyRun is supported by this provider
+      # Remove the Dnsmasq package.
       #
-      # (see Chef::Provider#whyrun_supported?)
-      #
-      def whyrun_supported?
-        true
-      end
-
-      #
-      # Install the Dnsmasq package.
-      #
-      action :install do
-        package 'dnsmasq' do
-          version new_resource.version unless new_resource.version.nil?
-        end
-      end
-
-      #
-      # Upgrade the Dnsmasq package.
-      #
-      action :upgrade do
-        package('dnsmasq') { action :upgrade }
+      action :remove do
+        package('dnsmasq') { action :remove }
       end
     end
   end

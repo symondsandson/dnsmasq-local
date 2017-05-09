@@ -1,5 +1,6 @@
 # encoding: utf-8
 # frozen_string_literal: true
+
 #
 # Cookbook Name:: dnsmasq-local
 # Library:: resource_dnsmasq_local_service
@@ -20,18 +21,15 @@
 #
 
 require 'chef/resource/service'
-require 'chef/resource/lwrp_base'
+require 'chef/resource'
 
 class Chef
   class Resource
     # A Chef resource for acting on the dnsmasq service.
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
-    class DnsmasqLocalService < LWRPBase # rubocop:disable Style/Documentation
-      self.resource_name = :dnsmasq_local_service
-      actions Chef::Resource::Service.new('_', nil).allowed_actions + \
-              [:create, :remove].uniq
-      default_action [:create, :enable, :start]
+    class DnsmasqLocalService < Service
+      default_action %i[create enable start]
 
       #
       # Allow the user to pass in either hash of command-line options to be
@@ -39,7 +37,7 @@ class Chef
       # that can only be set as switches and have no equivalent that can live
       # in a dnsmasq.conf.
       #
-      # Following Chef attribute style, options should be passed in with
+      # Following Chef property style, options should be passed in with
       # underscores in place of dashes and will be converted by the provider,
       # e.g.:
       #
@@ -53,10 +51,10 @@ class Chef
       #
       # Only the longform names of these switches are supported.
       #
-      attribute :options, kind_of: Hash, default: {}
+      property :options, Hash, default: {}
 
       #
-      # Allow individual attributes to be fed in and merged with the default
+      # Allow individual properties to be fed in and merged with the default
       # options without blowing away the entire hash.
       #
       # (see Chef::Resource#method_missing)
@@ -81,15 +79,71 @@ class Chef
       end
 
       #
-      # Add a newly-declared attribute into the list of desired state
-      # attributes to account for the fact that Chef 12 defaults this to true
-      # while 11 defaults it to false.
+      # Tell NetworkManager to relinquish control of Dnsmasq, if applicable,
+      # and generate the `/etc/default/dnsmasq` file for the service.
       #
-      # @param attr [Symbol] the new attribute to add to the list of state ones
+      action :create do
+        if shell_out('pgrep NetworkManager').exitstatus.zero?
+          service 'NetworkManager' do
+            supports(status: true, restart: true)
+            action :nothing
+          end
+          directory '/etc/NetworkManager/conf.d'
+          file '/etc/NetworkManager/conf.d/20-dnsmasq.conf' do
+            content "[main]\ndns=none"
+            notifies :restart, 'service[NetworkManager]', :immediately
+          end
+        end
+        merged_options = new_resource.options.merge(
+          new_resource.state.select { |k, v| k != :options && !v.nil? }
+        )
+        file '/etc/default/dnsmasq' do
+          header = <<-EOH.gsub(/^ +/, '')
+            # This file is managed by Chef.
+            # Any changes to it will be overwritten.
+          EOH
+          opts_str = merged_options.map do |k, v|
+            if v == true
+              "--#{k.to_s.tr('_', '-')}"
+            elsif v
+              "--#{k.to_s.tr('_', '-')}=#{v}"
+            end
+          end.compact.join(' ')
+          content(header + "DNSMASQ_OPTS='#{opts_str}'")
+        end
+      end
+
       #
-      def add_state_attr(attr)
-        new_attrs = (self.class.state_attrs << attr).uniq
-        self.class.state_attrs(*new_attrs)
+      # Clean up the NetworkManager config, if appilcable, and the defaults
+      # file.
+      #
+      action :remove do
+        file('/etc/default/dnsmasq') { action :delete }
+        if shell_out('pgrep NetworkManager').exitstatus.zero?
+          service 'NetworkManager' do
+            supports(status: true, restart: true)
+            action :nothing
+          end
+          file '/etc/NetworkManager/conf.d/20-dnsmasq.conf' do
+            action :delete
+            notifies :restart, 'service[NetworkManager]', :immediately
+          end
+        end
+      end
+
+      #
+      # Every action that isn't :create or :remove should be passed on to a
+      # standard Chef service resource.
+      #
+      Resource::DnsmasqLocalService.allowed_actions.each do |a|
+        next if %i[create remove].include?(a)
+        action(a) do
+          service "#{a} dnsmasq" do
+            service_name 'dnsmasq'
+            supports restart: true, status: true
+            action a
+          end
+        end
       end
     end
   end

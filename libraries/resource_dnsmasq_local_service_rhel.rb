@@ -1,8 +1,9 @@
 # encoding: utf-8
 # frozen_string_literal: true
+
 #
 # Cookbook Name:: dnsmasq-local
-# Library:: provider_dnsmasq_local_service_rhel
+# Library:: resource_dnsmasq_local_service_rhel
 #
 # Copyright 2016, Socrata, Inc.
 #
@@ -19,11 +20,11 @@
 # limitations under the License.
 #
 
-require_relative 'provider_dnsmasq_local_service'
+require_relative 'resource_dnsmasq_local_service'
 
 class Chef
-  class Provider
-    # A Chef provider for Systemd RHEL services.
+  class Resource
+    # A Chef resource for RHEL services.
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
     class DnsmasqLocalServiceRhel < DnsmasqLocalService
