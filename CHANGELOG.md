@@ -5,6 +5,7 @@ Unreleased
 ----------
 - Drop Chef 11 compatibility, test against Chef 13 and 12
 - Convert all the HWRPs to Chef custom resources
+- Patch the custom resources for Chef 13 compatibility
 
 v1.1.0 (2016-08-11)
 -------------------

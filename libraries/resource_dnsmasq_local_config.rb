@@ -32,8 +32,6 @@ class Chef
 
       default_action :create
 
-      state_attrs :config
-
       #
       # Set up a default config property hash that can overridden in its
       # entirety by the user passing in a new one. The default config will:
@@ -69,21 +67,11 @@ class Chef
       #
       def method_missing(method_symbol, *args, &block)
         if block.nil? && args.length == 1 && !method_symbol.match(/^to_/)
-          self.class.attribute method_symbol, kind_of: args[0].class
-          add_state_attr(method_symbol)
+          self.class.property(method_symbol, args[0].class)
           send(method_symbol, args[0]) unless args[0].nil?
         else
           super
         end
-      end
-
-      #
-      # Respond to missing methods.
-      #
-      # (see Object#respond_to_missing?)
-      #
-      def respond_to_missing?(method_symbol, *args, &block)
-        block.nil? && args.length == 1 && !method_symbol.match(/^to_/) || super
       end
 
       #
@@ -99,8 +87,12 @@ class Chef
           EOH
         end
         directory '/etc/dnsmasq.d'
+        extras = new_resource.class.state_properties.map(&:name)
+        extras.delete_if { |p| p == :config || new_resource.send(p).nil? }
         merged_config = new_resource.config.merge(
-          new_resource.state.select { |k, v| k != :config && !v.nil? }
+          extras.each_with_object({}) do |p, hsh|
+            hsh[p] = new_resource.send(p)
+          end
         )
         file '/etc/dnsmasq.d/dns.conf' do
           content config_body_for(merged_config)
@@ -138,7 +130,7 @@ class Chef
       # string representation of them.
       #
       # @param key [Symbol, String] the dnsmasq config key
-      # @param val [TrueClass, FalseClass, String, Fixnum, Array] the value(s)
+      # @param val [TrueClass, FalseClass, String, Integer, Array] the value(s)
       #
       # @return [String, NilClass] the rendered config string or nil for an
       #                            empty one
@@ -146,7 +138,7 @@ class Chef
       def config_for(key, val)
         case val
         when TrueClass, FalseClass then key.to_s.tr('_', '-') if val
-        when String, Fixnum then "#{key.to_s.tr('_', '-')}=#{val}"
+        when String, Integer then "#{key.to_s.tr('_', '-')}=#{val}"
         when Array then val.map { |v| config_for(key, v) }.join("\n")
         when Hash then config_for(key, val.keys.select { |k| val[k] })
         else raise(Exceptions::ValidationFailed,

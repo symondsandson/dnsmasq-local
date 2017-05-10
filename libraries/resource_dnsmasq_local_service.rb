@@ -28,7 +28,7 @@ class Chef
     # A Chef resource for acting on the dnsmasq service.
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
-    class DnsmasqLocalService < Service
+    class DnsmasqLocalService < Resource
       default_action %i[create enable start]
 
       #
@@ -61,21 +61,11 @@ class Chef
       #
       def method_missing(method_symbol, *args, &block)
         if block.nil? && args.length == 1 && !method_symbol.match(/^to_/)
-          self.class.attribute method_symbol, kind_of: args[0].class
-          add_state_attr(method_symbol)
+          self.class.property(method_symbol, kind_of: args[0].class)
           send(method_symbol, args[0]) unless args[0].nil?
         else
           super
         end
-      end
-
-      #
-      # Respond to missing methods.
-      #
-      # (see Object#respond_to_missing?)
-      #
-      def respond_to_missing?(method_symbol, *args, &block)
-        block.nil? && args.length == 1 && !method_symbol.match(/^to_/) || super
       end
 
       #
@@ -94,8 +84,12 @@ class Chef
             notifies :restart, 'service[NetworkManager]', :immediately
           end
         end
+        extras = new_resource.class.state_properties.map(&:name)
+        extras.delete_if { |p| p == :options || new_resource.send(p).nil? }
         merged_options = new_resource.options.merge(
-          new_resource.state.select { |k, v| k != :options && !v.nil? }
+          extras.each_with_object({}) do |p, hsh|
+            hsh[p] = new_resource.send(p)
+          end
         )
         file '/etc/default/dnsmasq' do
           header = <<-EOH.gsub(/^ +/, '')
@@ -135,8 +129,7 @@ class Chef
       # Every action that isn't :create or :remove should be passed on to a
       # standard Chef service resource.
       #
-      Resource::DnsmasqLocalService.allowed_actions.each do |a|
-        next if %i[create remove].include?(a)
+      Chef::Resource::Service.allowed_actions.each do |a|
         action(a) do
           service "#{a} dnsmasq" do
             service_name 'dnsmasq'
@@ -149,4 +142,4 @@ class Chef
   end
 end unless defined?(Chef::Resource::DnsmasqLocalService)
 # Don't let this class be reloaded or strange things happen to the custom
-# attributes we've loaded in via `method_missing`.
+# property we've loaded in via `method_missing`.
