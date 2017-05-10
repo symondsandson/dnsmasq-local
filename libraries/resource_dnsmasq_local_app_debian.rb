@@ -36,7 +36,7 @@ class Chef
       action :install do
         package 'dnsmasq' do
           version new_resource.version unless new_resource.version.nil?
-          options '-o Dpkg::Options::="--force-confold"'
+          options '-o Dpkg::Options::=--force-confold'
         end
       end
 
@@ -45,7 +45,7 @@ class Chef
       #
       action :upgrade do
         package 'dnsmasq' do
-          options '-o Dpkg::Options::="--force-confold"'
+          options '-o Dpkg::Options::=--force-confold'
           action :upgrade
         end
       end

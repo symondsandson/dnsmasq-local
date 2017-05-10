@@ -1,15 +1,14 @@
 # encoding: utf-8
 # frozen_string_literal: true
 
-require_relative '../rhel'
+require_relative '../centos'
 
-describe 'resources::dnsmasq_local_service::centos::7_0' do
-  include_context 'resources::dnsmasq_local_service::rhel'
+describe 'resources::dnsmasq_local_service::centos::7_3_1611' do
+  include_context 'resources::dnsmasq_local_service::centos'
 
-  let(:platform) { 'centos' }
-  let(:platform_version) { '7.0' }
+  let(:platform_version) { '7.3.1611' }
 
-  it_behaves_like 'any RHEL platform'
+  it_behaves_like 'any CentOS platform'
 
   shared_examples_for 'systemd patching' do
     it 'creates the Dnsmasq service directory' do
@@ -47,7 +46,7 @@ describe 'resources::dnsmasq_local_service::centos::7_0' do
     end
   end
 
-  context 'the default action ([:create, :enable, :start])' do
+  context 'the default action' do
     include_context description
 
     it_behaves_like 'systemd patching'

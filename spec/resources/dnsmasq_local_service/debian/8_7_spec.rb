@@ -3,11 +3,10 @@
 
 require_relative '../debian'
 
-describe 'resources::dnsmasq_local_service::debian::8_4' do
+describe 'resources::dnsmasq_local_service::debian::8_7' do
   include_context 'resources::dnsmasq_local_service::debian'
 
-  let(:platform) { 'debian' }
-  let(:platform_version) { '8.4' }
+  let(:platform_version) { '8.7' }
 
   it_behaves_like 'any Debian platform'
 end

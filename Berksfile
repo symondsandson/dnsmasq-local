@@ -6,8 +6,7 @@ source 'https://supermarket.chef.io'
 metadata
 
 group :unit do
-  cookbook 'dnsmasq_local_resource_test',
-           path: 'spec/support/cookbooks/dnsmasq_local_resource_test'
+  cookbook 'resource_test', path: 'spec/support/cookbooks/resource_test'
 end
 
 group :integration do

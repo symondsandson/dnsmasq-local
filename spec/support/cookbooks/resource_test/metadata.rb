@@ -1,7 +1,7 @@
 # encoding: utf-8
 # frozen_string_literal: true
 
-name 'dnsmasq_local_resource_test'
+name 'resource_test'
 maintainer 'Jonathan Hartman'
 maintainer_email 'jonathan.hartman@socrata.com'
 license 'apache2'

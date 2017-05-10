@@ -1,13 +1,12 @@
 # encoding: utf-8
 # frozen_string_literal: true
 
-require_relative '../rhel'
+require_relative '../redhat'
 
-describe 'resources::dnsmasq_local_service::redhat::7_1' do
-  include_context 'resources::dnsmasq_local_service::rhel'
+describe 'resources::dnsmasq_local_service::redhat::7_3' do
+  include_context 'resources::dnsmasq_local_service::redhat'
 
-  let(:platform) { 'redhat' }
-  let(:platform_version) { '7.1' }
+  let(:platform_version) { '7.3' }
 
   it_behaves_like 'any RHEL platform'
 
@@ -47,7 +46,7 @@ describe 'resources::dnsmasq_local_service::redhat::7_1' do
     end
   end
 
-  context 'the default action ([:create, :enable, :start])' do
+  context 'the default action' do
     include_context description
 
     it_behaves_like 'systemd patching'

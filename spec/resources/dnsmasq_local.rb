@@ -1,5 +1,6 @@
 # encoding: utf-8
 # frozen_string_literal: true
+
 require_relative '../resources'
 
 shared_context 'resources::dnsmasq_local' do
@@ -10,9 +11,29 @@ shared_context 'resources::dnsmasq_local' do
   let(:properties) { { config: config, options: options } }
   let(:name) { 'default' }
 
+  shared_context 'the :create action' do
+  end
+
+  shared_context 'the :remove action' do
+    let(:action) { :remove }
+  end
+
+  shared_context 'all default properties' do
+  end
+
+  shared_context 'an overridden config property' do
+    let(:config) { { example: 'elpmaxe' } }
+  end
+
+  shared_context 'an overridden options property' do
+    let(:options) { { example: 'elpmaxe' } }
+  end
+
   shared_examples_for 'any platform' do
-    context 'the default action (:create)' do
-      shared_examples_for 'any attribute set' do
+    context 'the :create action' do
+      include_context description
+
+      shared_examples_for 'any property set' do
         it 'creates the dnsmasq_local_config' do
           expected = {
             config: {
@@ -43,26 +64,28 @@ shared_context 'resources::dnsmasq_local' do
         end
       end
 
-      context 'the default attributes' do
-        it_behaves_like 'any attribute set'
+      context 'all default properties' do
+        include_context description
+
+        it_behaves_like 'any property set'
       end
 
-      context 'a config attribute' do
-        let(:config) { { example: 'elpmaxe' } }
+      context 'an overridden config property' do
+        include_context description
 
-        it_behaves_like 'any attribute set'
+        it_behaves_like 'any property set'
       end
 
-      context 'an options attribute' do
-        let(:options) { { example: 'elpmaxe' } }
+      context 'an overridden options property' do
+        include_context description
 
-        it_behaves_like 'any attribute set'
+        it_behaves_like 'any property set'
       end
     end
   end
 
   context 'the :remove action' do
-    let(:action) { :remove }
+    include_context description
 
     it 'stops, disables, and removes the dnsmasq_local_service' do
       expect(chef_run).to stop_dnsmasq_local_service('default')
