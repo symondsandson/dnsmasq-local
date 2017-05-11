@@ -3,7 +3,7 @@
 
 execute 'apt-get update' if node['platform_family'] == 'debian'
 
-if %w(docker lxc).include?(node['virtualization']['system'])
+if %w[docker lxc].include?(node['virtualization']['system'])
   case node['platform_family']
   when 'debian'
     # Fake out the Docker build and its immutable resolv.conf.
@@ -13,13 +13,13 @@ if %w(docker lxc).include?(node['virtualization']['system'])
     package 'resolvconf'
 
     service 'resolvconf' do
-      action [:enable, :start]
+      action %i[enable start]
     end
   when 'rhel'
     if node['platform_version'].to_i >= 7
       package 'NetworkManager'
       service 'NetworkManager' do
-        action [:enable, :start]
+        action %i[enable start]
       end
     end
   end

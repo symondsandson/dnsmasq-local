@@ -1,15 +1,14 @@
 # encoding: utf-8
 # frozen_string_literal: true
 
-require_relative '../rhel'
+require_relative '../centos'
 
 describe 'resources::dnsmasq_local_service::centos::6_8' do
-  include_context 'resources::dnsmasq_local_service::rhel'
+  include_context 'resources::dnsmasq_local_service::centos'
 
-  let(:platform) { 'centos' }
   let(:platform_version) { '6.8' }
 
-  it_behaves_like 'any RHEL platform'
+  it_behaves_like 'any CentOS platform'
 
   shared_examples_for 'init script patching' do
     before(:each) do
@@ -103,7 +102,7 @@ describe 'resources::dnsmasq_local_service::centos::6_8' do
     end
   end
 
-  context 'the default action ([:create, :enable, :start])' do
+  context 'the default action' do
     include_context description
 
     it_behaves_like 'init script patching'

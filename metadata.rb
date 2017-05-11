@@ -4,22 +4,17 @@
 name 'dnsmasq-local'
 maintainer 'Jonathan Hartman'
 maintainer_email 'jonathan.hartman@socrata.com'
-license 'apache2'
+license 'Apache-2.0'
 description 'Configures a local-only dnsmasq'
 long_description 'Configures a local-only dnsmasq'
 version '1.1.1'
+chef_version '>= 12'
 
-if respond_to?(:source_url)
-  source_url 'https://github.com/socrata-cookbooks/dnsmasq-local'
-end
-if respond_to?(:issues_url)
-  issues_url 'https://github.com/socrata-cookbooks/dnsmasq-local/issues'
-end
+source_url 'https://github.com/socrata-cookbooks/dnsmasq-local'
+issues_url 'https://github.com/socrata-cookbooks/dnsmasq-local/issues'
 
 supports 'ubuntu'
 supports 'debian'
 supports 'redhat'
 supports 'centos'
 supports 'scientific'
-
-conflicts 'dnsmasq'

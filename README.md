@@ -18,8 +18,7 @@ Requirements
 
 This cookbook currently supports both Debian-based and RHEL-based platforms.
 
-At least for the time being, it supports Chef 11+, at the expense of some
-additional complexity to maintain backwards compatibility.
+It now requires Chef 12.5+.
 
 Usage
 =====
@@ -200,51 +199,6 @@ Attributes:
 
 \* Command line options can be passed in either as one complete `options` hash,
    or as individual attribute calls for each option.
-
-Providers
-=========
-
-***Chef::Provider::DnsmasqLocal***
-
-Provider that wraps each of the Dnsmasq component resources.
-
-***Chef::Provider::DnsmasqLocalApp***
-
-Parent provider for managing Dnsmasq app packages.
-
-***Chef::Provider::DnsmasqLocalAppDebian***
-
-The Ubuntu/Debian implementation of the app provider.
-
-***Chef::Provider::DnsmasqLocalAppRhel***
-
-The RHEL implementation of the app provider.
-
-***Chef::Provider::DnsmasqLocalConfig***
-
-Platform-agnostic provider for managing Dnsmasq config files.
-
-***Chef::Provider::DnsmasqLocalService***
-
-Parent provider for managing the Dnsmasq service.
-
-***Chef::Provider::DnsmasqLocalServiceDebian***
-
-The Ubuntu/Debian implementation of the service provider. As of 16.04, Ubuntu
-has yet to switch Dnsmasq to either Upstart or Systemd, so only the single
-provider is needed.
-
-***Chef::Provider::DnsmasqLocalServiceRhelSystemd***
-
-The RHEL >= 7 Systemd implementation of the service provider. Also patches the
-Systemd config to pass the desired command line options to Dnsmasq via
-`/etc/default/dnsmasq`.
-
-***Chef::Provider::DnsmasqLocalServiceRhelSysvinit***
-
-The RHEL < 7 init implementation of the service provider. Also patches the
-init script to pass the desired command line options to Dnsmasq via
-`/etc/default/dnsmasq`.
 
 Contributing
 ============

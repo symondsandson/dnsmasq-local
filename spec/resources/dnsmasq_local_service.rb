@@ -7,7 +7,7 @@ shared_context 'resources::dnsmasq_local_service' do
   include_context 'resources'
 
   let(:resource) { 'dnsmasq_local_service' }
-  %i(options network_manager_enabled).each { |p| let(p) { nil } }
+  %i[options network_manager_enabled].each { |p| let(p) { nil } }
   let(:properties) { { options: options } }
   let(:name) { 'default' }
 
@@ -19,9 +19,55 @@ shared_context 'resources::dnsmasq_local_service' do
       .and_return(double(exitstatus: network_manager_running? ? 0 : 1))
   end
 
+  shared_context 'the default action' do
+  end
+
+  shared_context 'the :create action' do
+    let(:action) { :create }
+  end
+
+  shared_context 'the :remove action' do
+    let(:action) { :remove }
+  end
+
+  shared_context 'the :enable action' do
+    let(:action) { :enable }
+  end
+
+  shared_context 'the :disable action' do
+    let(:action) { :disable }
+  end
+
+  shared_context 'the :start action' do
+    let(:action) { :start }
+  end
+
+  shared_context 'the :stop action' do
+    let(:action) { :stop }
+  end
+
+  shared_context 'all default properties' do
+  end
+
+  shared_context 'an overridden options property' do
+    let(:options) { { thing_1: true, thing_2: 'test', bad: false } }
+  end
+
+  shared_context 'some extra properties' do
+    let(:properties) { { thing_1: true, thing_2: 'test', bad: false } }
+  end
+
+  shared_context 'the NetworkManager service running' do
+    let(:network_manager_running?) { true }
+  end
+
   shared_examples_for 'any platform' do
-    context 'the default action ([:create, :enable, :start])' do
-      context 'the default attributes' do
+    context 'the default action' do
+      include_context description
+
+      context 'all default properties' do
+        include_context description
+
         it 'generates the expected defaults file' do
           expected = <<-EOH.gsub(/^ +/, '').strip
             # This file is managed by Chef.
@@ -47,9 +93,11 @@ shared_context 'resources::dnsmasq_local_service' do
     end
 
     context 'the :create action' do
-      let(:action) { :create }
+      include_context description
 
-      context 'the default attributes' do
+      context 'all default properties' do
+        include_context description
+
         it 'creates the defaults file' do
           expected = <<-EOH.gsub(/^ +/, '').strip
             # This file is managed by Chef.
@@ -61,8 +109,8 @@ shared_context 'resources::dnsmasq_local_service' do
         end
       end
 
-      context 'a default options override' do
-        let(:options) { { thing_1: true, thing_2: 'test', bad: false } }
+      context 'an overridden options property' do
+        include_context description
 
         it 'generates the expected defaults file' do
           expected = <<-EOH.gsub(/^ +/, '').strip
@@ -75,8 +123,8 @@ shared_context 'resources::dnsmasq_local_service' do
         end
       end
 
-      context 'some extra options to merge in with the default' do
-        let(:properties) { { thing_1: true, thing_2: 'test', bad: false } }
+      context 'some extra properties' do
+        include_context description
 
         it 'generates the expected defaults file' do
           expected = <<-EOH.gsub(/^ +/, '').strip
@@ -90,14 +138,10 @@ shared_context 'resources::dnsmasq_local_service' do
       end
 
       context 'the NetworkManager service running' do
-        let(:network_manager_running?) { true }
+        include_context description
 
         it 'defines a NetworkManager service resource' do
           expect(chef_run.service('NetworkManager')).to do_nothing
-        end
-
-        it 'creates the NetworkManager conf.d directory' do
-          expect(chef_run).to create_directory('/etc/NetworkManager/conf.d')
         end
 
         it 'drops off a Dnsmasq NetworkManager config' do
@@ -120,16 +164,18 @@ shared_context 'resources::dnsmasq_local_service' do
     end
 
     context 'the :remove action' do
-      let(:action) { :remove }
+      include_context description
 
-      context 'the default attributes' do
+      context 'all default properties' do
+        include_context description
+
         it 'deletes the defaults file' do
           expect(chef_run).to delete_file('/etc/default/dnsmasq')
         end
       end
 
       context 'the NetworkManager service running' do
-        let(:network_manager_running?) { true }
+        include_context description
 
         it 'defines a NetworkManager service resource' do
           expect(chef_run.service('NetworkManager')).to do_nothing
@@ -144,9 +190,9 @@ shared_context 'resources::dnsmasq_local_service' do
       end
     end
 
-    %i(enable disable start stop).each do |a|
+    %i[enable disable start stop].each do |a|
       context "the :#{a} action" do
-        let(:action) { a }
+        include_context description
 
         it 'passes the action on to a service resource' do
           expect(chef_run).to send("#{a}_service", "#{a} dnsmasq").with(
@@ -155,16 +201,5 @@ shared_context 'resources::dnsmasq_local_service' do
         end
       end
     end
-  end
-
-  shared_context 'the default action ([:create, :enable, :start])' do
-  end
-
-  shared_context 'the :create action' do
-    let(:action) { :create }
-  end
-
-  shared_context 'the :remove action' do
-    let(:action) { :remove }
   end
 end
