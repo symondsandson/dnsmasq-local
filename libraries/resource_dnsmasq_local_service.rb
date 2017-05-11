@@ -23,12 +23,12 @@
 require 'chef/resource/service'
 require 'chef/resource'
 
-class Chef
+class Chef # rubocop:disable Style/MultilineIfModifier
   class Resource
     # A Chef resource for acting on the dnsmasq service.
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
-    class DnsmasqLocalService < Resource
+    class DnsmasqLocalService < Resource # rubocop:disable Style/Documentation
       default_action %i[create enable start]
 
       #
@@ -69,6 +69,15 @@ class Chef
       end
 
       #
+      # The property calls in method_missing do all the work for this.
+      #
+      # (see Object#respond_to_missing?)
+      #
+      def respond_to_missing?(method_symbol, include_private = false)
+        super
+      end
+
+      #
       # Tell NetworkManager to relinquish control of Dnsmasq, if applicable,
       # and generate the `/etc/default/dnsmasq` file for the service.
       #
@@ -78,7 +87,6 @@ class Chef
             supports(status: true, restart: true)
             action :nothing
           end
-          directory '/etc/NetworkManager/conf.d'
           file '/etc/NetworkManager/conf.d/20-dnsmasq.conf' do
             content "[main]\ndns=none"
             notifies :restart, 'service[NetworkManager]', :immediately
@@ -92,18 +100,7 @@ class Chef
           end
         )
         file '/etc/default/dnsmasq' do
-          header = <<-EOH.gsub(/^ +/, '')
-            # This file is managed by Chef.
-            # Any changes to it will be overwritten.
-          EOH
-          opts_str = merged_options.map do |k, v|
-            if v == true
-              "--#{k.to_s.tr('_', '-')}"
-            elsif v
-              "--#{k.to_s.tr('_', '-')}=#{v}"
-            end
-          end.compact.join(' ')
-          content(header + "DNSMASQ_OPTS='#{opts_str}'")
+          content(defaults_file_content(merged_options))
         end
       end
 
@@ -137,6 +134,26 @@ class Chef
             action a
           end
         end
+      end
+
+      #
+      # Return a rendered /etc/default/dnsmasq based on a set of options.
+      #
+      # @param opts [Hash] a set of dnsmasq defaults
+      #
+      def defaults_file_content(opts)
+        header = <<-EOH.gsub(/^ +/, '')
+          # This file is managed by Chef.
+          # Any changes to it will be overwritten.
+        EOH
+        opts_str = opts.map do |k, v|
+          if v == true
+            "--#{k.to_s.tr('_', '-')}"
+          elsif v
+            "--#{k.to_s.tr('_', '-')}=#{v}"
+          end
+        end.compact.join(' ')
+        header + "DNSMASQ_OPTS='#{opts_str}'"
       end
     end
   end

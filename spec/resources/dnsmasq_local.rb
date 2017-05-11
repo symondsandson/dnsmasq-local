@@ -7,7 +7,7 @@ shared_context 'resources::dnsmasq_local' do
   include_context 'resources'
 
   let(:resource) { 'dnsmasq_local' }
-  %i(config options).each { |p| let(p) { nil } }
+  %i[config options].each { |p| let(p) { nil } }
   let(:properties) { { config: config, options: options } }
   let(:name) { 'default' }
 

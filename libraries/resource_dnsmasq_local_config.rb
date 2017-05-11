@@ -22,12 +22,12 @@
 
 require 'chef/resource'
 
-class Chef
+class Chef # rubocop:disable Style/MultilineIfModifier
   class Resource
     # A Chef resource for generating Dnsmasq configs.
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
-    class DnsmasqLocalConfig < Resource
+    class DnsmasqLocalConfig < Resource # rubocop:disable Style/Documentation
       provides :dnsmasq_local_config
 
       default_action :create
@@ -50,14 +50,14 @@ class Chef
       # rendering the final config file.
       #
       property :config,
-                Hash,
-                default: {
-                  interface: '',
-                  cache_size: 0,
-                  no_hosts: true,
-                  bind_interfaces: true,
-                  query_port: 0
-                }
+               Hash,
+               default: {
+                 interface: '',
+                 cache_size: 0,
+                 no_hosts: true,
+                 bind_interfaces: true,
+                 query_port: 0
+               }
 
       #
       # Allow individual properties to be fed in so that they're merged with
@@ -72,6 +72,15 @@ class Chef
         else
           super
         end
+      end
+
+      #
+      # The property calls in method_missing do all the work for this.
+      #
+      # (see Object#respond_to_missing?)
+      #
+      def respond_to_missing?(method_symbol, include_private = false)
+        super
       end
 
       #

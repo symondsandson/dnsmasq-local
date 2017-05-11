@@ -7,7 +7,7 @@ shared_context 'resources::dnsmasq_local_config' do
   include_context 'resources'
 
   let(:resource) { 'dnsmasq_local_config' }
-  %i(config).each { |p| let(p) { nil } }
+  %i[config].each { |p| let(p) { nil } }
   let(:properties) { { config: config } }
   let(:name) { 'default' }
 
@@ -39,7 +39,7 @@ shared_context 'resources::dnsmasq_local_config' do
         interface: 'docker0',
         no_hosts: false,
         example: 'elpmaxe',
-        server: %w(8.8.8.8 8.8.4.4),
+        server: %w[8.8.8.8 8.8.4.4],
         bool: true,
         other_bool: false
       }

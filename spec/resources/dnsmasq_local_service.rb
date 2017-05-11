@@ -7,7 +7,7 @@ shared_context 'resources::dnsmasq_local_service' do
   include_context 'resources'
 
   let(:resource) { 'dnsmasq_local_service' }
-  %i(options network_manager_enabled).each { |p| let(p) { nil } }
+  %i[options network_manager_enabled].each { |p| let(p) { nil } }
   let(:properties) { { options: options } }
   let(:name) { 'default' }
 
@@ -144,10 +144,6 @@ shared_context 'resources::dnsmasq_local_service' do
           expect(chef_run.service('NetworkManager')).to do_nothing
         end
 
-        it 'creates the NetworkManager conf.d directory' do
-          expect(chef_run).to create_directory('/etc/NetworkManager/conf.d')
-        end
-
         it 'drops off a Dnsmasq NetworkManager config' do
           f = '/etc/NetworkManager/conf.d/20-dnsmasq.conf'
           expect(chef_run).to create_file(f).with(content: "[main]\ndns=none")
@@ -194,7 +190,7 @@ shared_context 'resources::dnsmasq_local_service' do
       end
     end
 
-    %i(enable disable start stop).each do |a|
+    %i[enable disable start stop].each do |a|
       context "the :#{a} action" do
         include_context description
 

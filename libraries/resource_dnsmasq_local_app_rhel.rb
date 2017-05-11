@@ -1,5 +1,5 @@
 # encoding: utf-8
-# frozen_string_literal: true#
+# frozen_string_literal: true
 
 # Cookbook Name:: dnsmasq-local
 # Library:: resource_dnsmasq_local_app_rhel

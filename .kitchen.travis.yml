@@ -2,6 +2,7 @@
 driver:
   name: dokken
   privileged: true
+  chef_version: latest
 
 transport:
   name: dokken
@@ -40,12 +41,12 @@ platforms:
   - name: ubuntu-16.04-chef-12
     driver:
       image: ubuntu:16.04
-      chef_image: chef/chef:12.20.3
+      chef_version: 12.20.3
       pid_one_command: /lib/systemd/systemd
   - name: ubuntu-14.04-chef-12
     driver:
       image: ubuntu:14.04
-      chef_image: chef/chef:12.20.3
+      chef_version: 12.20.3
       pid_one_command: /sbin/init
       intermediate_instructions:
         - RUN dpkg-divert --remove /sbin/initctl
@@ -53,15 +54,15 @@ platforms:
   - name: debian-8-chef12
     driver:
       image: debian:8
-      chef_image: chef/chef:12.20.3
+      chef_version: 12.20.3
       pid_one_command: /lib/systemd/systemd
   - name: centos-7-chef-12
     driver:
       image: centos:7
-      chef_image: chef/chef:12.20.3
+      chef_version: 12.20.3
       pid_one_command: /lib/systemd/systemd
   - name: centos-6-chef-12
     driver:
       image: centos:6
-      chef_image: chef/chef:12.20.3
+      chef_version: 12.20.3
       pid_one_command: /sbin/init

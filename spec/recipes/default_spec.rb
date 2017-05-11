@@ -4,11 +4,11 @@
 require_relative '../spec_helper'
 
 describe 'dnsmasq-local::default' do
-  %i(config options).each { |a| let(a) { nil } }
+  %i[config options].each { |a| let(a) { nil } }
   let(:platform) { { platform: 'ubuntu', version: '14.04' } }
   let(:runner) do
     ChefSpec::SoloRunner.new(platform) do |node|
-      %i(config options).each do |a|
+      %i[config options].each do |a|
         node.normal['dnsmasq_local'][a] = send(a) unless send(a).nil?
       end
     end

@@ -7,7 +7,7 @@ shared_context 'resources::dnsmasq_local_app' do
   include_context 'resources'
 
   let(:resource) { 'dnsmasq_local_app' }
-  %i(version).each { |p| let(p) { nil } }
+  %i[version].each { |p| let(p) { nil } }
   let(:properties) { { version: version } }
   let(:name) { 'default' }
 

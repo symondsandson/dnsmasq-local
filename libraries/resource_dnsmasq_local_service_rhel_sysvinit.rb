@@ -42,51 +42,9 @@ class Chef
         super()
         file '/etc/init.d/dnsmasq' do
           mode '0755'
-          content lazy {
-            lines = ::File.read('/etc/init.d/dnsmasq').lines
-
-            idx = lines.index { |l| l.strip == 'RETVAL=0' }
-
-            nl = '[ -n "$DNSMASQ_OPTS" ] && OPTIONS="$OPTIONS $DNSMASQ_OPTS"'
-            lines.insert(idx, "\n#{nl}\n\n") unless lines.include?("#{nl}\n")
-
-            nl = '. /etc/default/dnsmasq'
-            lines.insert(idx, "#{nl}\n") unless lines.include?("#{nl}\n")
-
-            idx = lines.index { |l| l.strip == 'daemon $dnsmasq $OPTIONS' }
-            idx && lines[idx] = <<-EOH.gsub(/^ {6}/, '')
-              mkdir -p /var/run/dnsmasq
-              cp /etc/resolv.conf /var/run/dnsmasq/resolv.conf
-              daemon $dnsmasq -r /var/run/dnsmasq/resolv.conf $OPTIONS
-            EOH
-
-            idx = lines.index do |l|
-              l.strip == '[ $RETVAL -eq 0 ] && touch /var/lock/subsys/dnsmasq'
-            end
-            idx && lines[idx] = <<-EOH.gsub(/^ {6}/, '')
-              if [ $RETVAL -eq 0 ]; then
-                touch /var/lock/subsys/dnsmasq
-                cp /var/run/dnsmasq/resolv.conf /var/run/dnsmasq/resolv.conf.new
-                sed -i '/^nameserver/d' /var/run/dnsmasq/resolv.conf.new
-                echo nameserver 127.0.0.1 >> /var/run/dnsmasq/resolv.conf.new
-                cp /var/run/dnsmasq/resolv.conf.new /etc/resolv.conf
-              fi
-            EOH
-
-            nl = 'cp /var/run/dnsmasq/resolv.conf /etc/resolv.conf'
-            idx = lines.index { |l| l.strip == 'killproc dnsmasq' }
-            unless lines[idx - 1].strip == nl
-              lines.insert(idx, "            #{nl}\n")
-            end
-
-            idx = lines.index do |l|
-              l.strip == '[ $RETVAL -eq 0 ] && rm -f ' \
-                '/var/lock/subsys/dnsmasq $PIDFILE'
-            end
-            idx && lines[idx] = '        [ $RETVAL -eq 0 ] && rm -rf ' \
-              "/var/lock/subsys/dnsmasq /var/run/dnsmasq\n"
-            lines.join
-          }
+          content(
+            lazy { patched_dnsmasq_init(::File.read('/etc/init.d/dnsmasq')) }
+          )
         end
       end
 
@@ -96,6 +54,67 @@ class Chef
       action :remove do
         super()
         file('/etc/init.d/dnsmasq') { action :delete }
+      end
+
+      def patched_dnsmasq_init(init_content)
+        lines = init_content.lines
+        insert_dnsmasq_opts(lines)
+        insert_enable_resolvconf(lines)
+        insert_disable_resolvconf(lines)
+        lines.join
+      end
+
+      def insert_dnsmasq_opts(lines)
+        idx = lines.index { |l| l.strip == 'RETVAL=0' }
+
+        nl = '[ -n "$DNSMASQ_OPTS" ] && OPTIONS="$OPTIONS $DNSMASQ_OPTS"'
+        lines.insert(idx, "\n#{nl}\n\n") unless lines.include?("#{nl}\n")
+
+        nl = '. /etc/default/dnsmasq'
+        lines.insert(idx, "#{nl}\n") unless lines.include?("#{nl}\n")
+      end
+
+      def insert_enable_resolvconf(lines)
+        idx = lines.index { |l| l.strip == 'daemon $dnsmasq $OPTIONS' }
+        idx && lines[idx] = daemon_str
+
+        idx = lines.index do |l|
+          l.strip == '[ $RETVAL -eq 0 ] && touch /var/lock/subsys/dnsmasq'
+        end
+        idx && lines[idx] = emplace_resolvconf_str
+      end
+
+      def daemon_str
+        <<-EOH.gsub(/^ {2}/, '')
+          mkdir -p /var/run/dnsmasq
+          cp /etc/resolv.conf /var/run/dnsmasq/resolv.conf
+          daemon $dnsmasq -r /var/run/dnsmasq/resolv.conf $OPTIONS
+        EOH
+      end
+
+      def emplace_resolvconf_str
+        <<-EOH.gsub(/^ {2}/, '')
+          if [ $RETVAL -eq 0 ]; then
+            touch /var/lock/subsys/dnsmasq
+            cp /var/run/dnsmasq/resolv.conf /var/run/dnsmasq/resolv.conf.new
+            sed -i '/^nameserver/d' /var/run/dnsmasq/resolv.conf.new
+            echo nameserver 127.0.0.1 >> /var/run/dnsmasq/resolv.conf.new
+            cp /var/run/dnsmasq/resolv.conf.new /etc/resolv.conf
+          fi
+        EOH
+      end
+
+      def insert_disable_resolvconf(lines)
+        nl = 'cp /var/run/dnsmasq/resolv.conf /etc/resolv.conf'
+        idx = lines.index { |l| l.strip == 'killproc dnsmasq' }
+        unless lines[idx - 1].strip == nl
+          lines.insert(idx, "            #{nl}\n")
+        end
+
+        find = '[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/dnsmasq $PIDFILE'
+        idx = lines.index { |l| l.strip == find }
+        idx && lines[idx] = '        [ $RETVAL -eq 0 ] && rm -rf ' \
+          "/var/lock/subsys/dnsmasq /var/run/dnsmasq\n"
       end
     end
   end

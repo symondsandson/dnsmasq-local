@@ -54,7 +54,7 @@ class Chef
       # Purge the Dnsmasq Debian packages.
       #
       action :remove do
-        %w(dnsmasq dnsmasq-base).each { |p| package(p) { action :purge } }
+        %w[dnsmasq dnsmasq-base].each { |p| package(p) { action :purge } }
       end
     end
   end

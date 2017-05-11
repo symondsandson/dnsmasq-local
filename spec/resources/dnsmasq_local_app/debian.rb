@@ -33,7 +33,7 @@ shared_context 'resources::dnsmasq_local_app::debian' do
       include_context description
 
       it 'purges the dnsmasq packages' do
-        %w(dnsmasq dnsmasq-base).each do |p|
+        %w[dnsmasq dnsmasq-base].each do |p|
           expect(chef_run).to purge_package(p)
         end
       end
