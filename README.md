@@ -130,6 +130,7 @@ A resource for generating Dnsmasq configurations.
 Syntax:
 
     dnsmasq_local_config 'default' do
+      path '/etc/somewhere/dns.conf'
       config(cache_size: 100)
       no_hosts false
       server %w(8.8.8.8 8.8.4.4)
@@ -146,16 +147,17 @@ Actions:
 
 Attributes:
 
-| Attribute       | Default    | Description                           |
-|-----------------|------------|---------------------------------------|
-| config          | See below  | A complete config hash \*             |
-| interface       | ''         | Listen only on the loopback interface |
-| cache_size      | 0          | Disable caching
-| no_hosts        | true       | Do not DNSify `/etc/hosts`            |
-| bind_interfaces | true       | Bind only to listening interfaces     |
-| query_port      | 0          | Use a static, ephemeral return port   |
-| \*\*            | `nil`      | Varies                                |
-| action          | `:create`  | Action(s) to perform                  |
+| Attribute       | Default                    | Description                         |
+|-----------------|----------------------------|-------------------------------------|
+| path            | Derived from resource name | The config file path                |
+| config          | See below                  | A complete config hash \*           |
+| interface       | ''                         | Listen only on the loopback         |
+| cache_size      | 0                          | Disable caching                     |
+| no_hosts        | true                       | Do not DNSify `/etc/hosts`          |
+| bind_interfaces | true                       | Bind only to listening interfaces   |
+| query_port      | 0                          | Use a static, ephemeral return port |
+| \*\*            | `nil`                      | Varies                              |
+| action          | `:create`                  | Action(s) to perform                |
 
 \* A config attribute that is passed in will override the entirety of the
   default config, whereas individual attributes passed in will be merged with
