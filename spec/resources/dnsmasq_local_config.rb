@@ -7,8 +7,8 @@ shared_context 'resources::dnsmasq_local_config' do
   include_context 'resources'
 
   let(:resource) { 'dnsmasq_local_config' }
-  %i[path config].each { |p| let(p) { nil } }
-  let(:properties) { { path: path, config: config } }
+  %i[filename config].each { |p| let(p) { nil } }
+  let(:properties) { { filename: filename, config: config } }
   let(:name) { 'default' }
 
   shared_context 'the :create action' do
@@ -21,8 +21,8 @@ shared_context 'resources::dnsmasq_local_config' do
   shared_context 'all default properties' do
   end
 
-  shared_context 'an overridden path property' do
-    let(:path) { '/tmp/dns.d/monkeypants.conf' }
+  shared_context 'an overridden filename property' do
+    let(:filename) { 'monkeypants.conf' }
   end
 
   shared_context 'an overridden config property' do
@@ -63,7 +63,7 @@ shared_context 'resources::dnsmasq_local_config' do
           expected = <<-EOH.gsub(/^ +/, '').strip
             # This file is managed by Chef.
             # Any changes to it will be overwritten.
-            conf-dir=#{path ? File.dirname(path) : '/etc/dnsmasq.d'}
+            conf-dir=/etc/dnsmasq.d
           EOH
           expect(chef_run).to create_file('/etc/dnsmasq.conf')
             .with(content: expected)
@@ -94,7 +94,7 @@ shared_context 'resources::dnsmasq_local_config' do
         end
       end
 
-      context 'an overridden path property' do
+      context 'an overridden filename property' do
         include_context description
 
         it 'generates the expected config' do
@@ -107,7 +107,7 @@ shared_context 'resources::dnsmasq_local_config' do
             no-hosts
             query-port=0
           EOH
-          expect(chef_run).to create_file('/tmp/dns.d/monkeypants.conf')
+          expect(chef_run).to create_file('/etc/dnsmasq.d/monkeypants.conf')
             .with(content: expected)
         end
       end
@@ -170,23 +170,25 @@ shared_context 'resources::dnsmasq_local_config' do
     let(:other_conf_files?) { nil }
 
     before do
+      allow(Dir).to receive(:exist?).and_call_original
+      allow(Dir).to receive(:exist?).with('/etc/dnsmasq.d').and_return(true)
       allow(Dir).to receive(:entries).and_call_original
       allow(Dir).to receive(:entries)
-        .with(path ? File.dirname(path) : '/etc/dnsmasq.d')
+        .with('/etc/dnsmasq.d')
         .and_return(other_conf_files? ? %w[. .. thing2.conf] : %w[. ..])
     end
 
     shared_examples_for 'any property set' do
       it 'deletes the config file' do
-        expect(chef_run).to delete_file(path || '/etc/dnsmasq.d/default.conf')
+        expect(chef_run).to delete_file(
+          "/etc/dnsmasq.d/#{filename || 'default.conf'}"
+        )
       end
     end
 
     shared_examples_for 'an empty conf.d dir' do
       it 'deletes the conf.d dir' do
-        expect(chef_run).to delete_directory(
-          path ? File.dirname(path) : '/etc/dnsmasq.d'
-        )
+        expect(chef_run).to delete_directory('/etc/dnsmasq.d')
       end
 
       it 'deletes the main config file' do
@@ -196,9 +198,7 @@ shared_context 'resources::dnsmasq_local_config' do
 
     shared_examples_for 'a populated conf.d dir' do
       it 'does not delete the conf.d dir' do
-        expect(chef_run).to_not delete_directory(
-          path ? File.dirname(path) : '/etc/dnsmasq.d'
-        )
+        expect(chef_run).to_not delete_directory('/etc/dnsmasq.d')
       end
 
       it 'does not delete the main config file' do
@@ -224,7 +224,7 @@ shared_context 'resources::dnsmasq_local_config' do
       end
     end
 
-    context 'an overridden path property' do
+    context 'an overridden filename property' do
       include_context description
 
       context 'an empty conf.d dir' do

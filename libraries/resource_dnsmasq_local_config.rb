@@ -33,14 +33,10 @@ class Chef # rubocop:disable Style/MultilineIfModifier
       default_action :create
 
       #
-      # Calculate a default path in dnsmasq.d based on the resource name but
-      # allow it to be overridden.
+      # The filename for this snippet of config. The resultant path to the
+      # config file will be "/etc/dnsmasq.d/#{filename}".
       #
-      property :path,
-               String,
-               default: lazy { |r|
-                 ::File.join('/etc/dnsmasq.d', "#{r.name}.conf")
-               }
+      property :filename, String, default: lazy { |r| "#{r.name}.conf" }
 
       #
       # Set up a default config property hash that can overridden in its
@@ -101,19 +97,19 @@ class Chef # rubocop:disable Style/MultilineIfModifier
           content <<-EOH.gsub(/^ +/, '').strip
             # This file is managed by Chef.
             # Any changes to it will be overwritten.
-            conf-dir=#{::File.dirname(new_resource.path)}
+            conf-dir=/etc/dnsmasq.d
           EOH
         end
-        directory ::File.dirname(new_resource.path)
+        directory '/etc/dnsmasq.d'
         extras = new_resource.class.state_properties.map(&:name)
-        %i[path config].each { |p| extras.delete(p) }
+        %i[filename config].each { |p| extras.delete(p) }
         extras.delete_if { |p| new_resource.send(p).nil? }
         merged_config = new_resource.config.merge(
           extras.each_with_object({}) do |p, hsh|
             hsh[p] = new_resource.send(p)
           end
         )
-        file new_resource.path do
+        file ::File.join('/etc/dnsmasq.d', new_resource.filename) do
           content config_body_for(merged_config)
         end
       end
@@ -122,17 +118,18 @@ class Chef # rubocop:disable Style/MultilineIfModifier
       # Delete Dnsmasq's config file and the config directory if it's empty.
       #
       action :remove do
-        file(new_resource.path) { action :delete }
+        file(::File.join('/etc/dnsmasq.d', new_resource.filename)) do
+          action :delete
+        end
 
-        # Dir#empty? was only introduced in Ruby 2.4.
-        if ::Dir.entries(::File.dirname(new_resource.path)) == %w[. ..]
-          directory ::File.dirname(new_resource.path) do
-            action :delete
-          end
-
-          file '/etc/dnsmasq.conf' do
-            action :delete
-          end
+        # To make this delete idempotent, we need to take action whether the
+        # config file's already been deleted on a previous run or not.
+        entries = ::Dir.exist?('/etc/dnsmasq.d') && \
+                  ::Dir.entries('/etc/dnsmasq.d')
+        entries.delete(new_resource.filename) if entries
+        if entries && entries.sort == %w[. ..]
+          directory('/etc/dnsmasq.d') { action :delete }
+          file('/etc/dnsmasq.conf') { action :delete }
         end
       end
 

@@ -130,7 +130,7 @@ A resource for generating Dnsmasq configurations.
 Syntax:
 
     dnsmasq_local_config 'default' do
-      path '/etc/somewhere/dns.conf'
+      filename 'dns'
       config(cache_size: 100)
       no_hosts false
       server %w(8.8.8.8 8.8.4.4)
@@ -149,7 +149,7 @@ Attributes:
 
 | Attribute       | Default                    | Description                         |
 |-----------------|----------------------------|-------------------------------------|
-| path            | Derived from resource name | The config file path                |
+| filename        | Derived from resource name | The /etc/dnsmasq.d filename         |
 | config          | See below                  | A complete config hash \*           |
 | interface       | ''                         | Listen only on the loopback         |
 | cache_size      | 0                          | Disable caching                     |
@@ -163,7 +163,7 @@ Attributes:
   default config, whereas individual attributes passed in will be merged with
   it.
 
-\*\* Any unrecognized attribute that is passed in will be assumed to be a
+\*\* Any unrecognized property that is passed in will be assumed to be a
   correct Dnsmasq setting and rendered out to its config. These attributes'
 values can be `true`, `false`, integers, strings, arrays, or hashes.
 

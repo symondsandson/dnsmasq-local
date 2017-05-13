@@ -10,7 +10,7 @@ describe 'dnsmasq-local::default::config' do
     end
   end
 
-  describe file('/etc/dnsmasq.d/dns.conf') do
+  describe file('/etc/dnsmasq.d/default.conf') do
     it 'is listening on the local interface only' do
       expect(subject.content).to match(/^interface=$/)
     end
