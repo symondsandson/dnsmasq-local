@@ -36,7 +36,11 @@ class Chef # rubocop:disable Style/MultilineIfModifier
       # The filename for this snippet of config. The resultant path to the
       # config file will be "/etc/dnsmasq.d/#{filename}".
       #
-      property :filename, String, default: lazy { |r| "#{r.name}.conf" }
+      property :filename,
+               String,
+               default: lazy { |r|
+                 r.name.end_with?('.conf') ? r.name : "#{r.name}.conf"
+               }
 
       #
       # Set up a default config property hash that can overridden in its
