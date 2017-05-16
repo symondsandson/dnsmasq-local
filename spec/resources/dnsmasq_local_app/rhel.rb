@@ -8,13 +8,5 @@ shared_context 'resources::dnsmasq_local_app::rhel' do
 
   shared_examples_for 'any RHEL platform' do
     it_behaves_like 'any platform'
-
-    context 'the :remove action' do
-      include_context description
-
-      it 'removes the dnsmasq package' do
-        expect(chef_run).to remove_package('dnsmasq')
-      end
-    end
   end
 end

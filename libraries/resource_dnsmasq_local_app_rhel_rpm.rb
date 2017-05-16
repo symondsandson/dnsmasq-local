@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 # Cookbook Name:: dnsmasq-local
-# Library:: resource_dnsmasq_local_app_rhel
+# Library:: resource_dnsmasq_local_app_rhel_rpm
 #
 # Copyright 2016, Socrata, Inc.
 #
@@ -19,14 +19,29 @@
 # limitations under the License.
 #
 
-require_relative 'resource_dnsmasq_local_app'
+require_relative 'resource_dnsmasq_local_app_rhel'
 
 class Chef
   class Resource
-    # A Dnsmasq package resouce specific to RHEL platforms.
+    # A Dnsmasq package resouce specific to RHEL6, whose %preun script tries
+    # to check the status of the service we've already removed by the time it
+    # runs.
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
-    class DnsmasqLocalAppRhel < DnsmasqLocalApp
+    class DnsmasqLocalAppRhelRpm < DnsmasqLocalAppRhel
+      provides :dnsmasq_local_app,
+               platform_family: 'rhel',
+               platform_version: '< 7'
+
+      #
+      # Remove the Dnsmasq package.
+      #
+      action :remove do
+        rpm_package 'dnsmasq' do
+          options '--noscripts' if node['platform_version'].to_i < 7
+          action :remove
+        end
+      end
     end
   end
 end
