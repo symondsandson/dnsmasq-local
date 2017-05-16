@@ -90,13 +90,13 @@ Actions:
 | `:create` | Install, configure, and enable+start Dnsmasq |
 | `:remove` | Stop+disable and remove Dnsmasq              |
 
-Attributes:
+Properties:
 
-| Attribute | Default   | Description                         |
-|-----------|-----------|-------------------------------------|
-| config    | `nil`     | A Dnsmasq configuration hash        |
-| options   | `nil`     | A Dnsmasq command line options hash |
-| Action    | `:create` | Action(s) to perform                |
+| Property | Default   | Description                         |
+|----------|-----------|-------------------------------------|
+| config   | `nil`     | A Dnsmasq configuration hash        |
+| options  | `nil`     | A Dnsmasq command line options hash |
+| Action   | `:create` | Action(s) to perform                |
 
 ***dnsmasq_local_app***
 
@@ -116,12 +116,12 @@ Actions:
 | `:upgrade` | Upgrade the Dnsmasq package   |
 | `:remove`  | Uninstall the Dnsmasq package |
 
-Attributes:
+Properties:
 
-| Attribute | Default    | Description                               |
-|-----------|------------|-------------------------------------------|
-| version   | `nil`      | Install a specific version of the package |
-| action    | `:install` | Action(s) to perform                      |
+| Property | Default    | Description                               |
+|----------|------------|-------------------------------------------|
+| version  | `nil`      | Install a specific version of the package |
+| action   | `:install` | Action(s) to perform                      |
 
 ***dnsmasq_local_config***
 
@@ -145,9 +145,9 @@ Actions:
 | `:create` | Write out the Dnsmasq config file |
 | `:remove` | Delete the Dnsmasq config file    |
 
-Attributes:
+Properties:
 
-| Attribute       | Default                    | Description                         |
+| Property        | Default                    | Description                         |
 |-----------------|----------------------------|-------------------------------------|
 | filename        | Derived from resource name | The /etc/dnsmasq.d filename         |
 | config          | See below                  | A complete config hash \*           |
@@ -159,12 +159,12 @@ Attributes:
 | \*\*            | `nil`                      | Varies                              |
 | action          | `:create`                  | Action(s) to perform                |
 
-\* A config attribute that is passed in will override the entirety of the
-  default config, whereas individual attributes passed in will be merged with
+\* A config property that is passed in will override the entirety of the
+  default config, whereas individual properties passed in will be merged with
   it.
 
 \*\* Any unrecognized property that is passed in will be assumed to be a
-  correct Dnsmasq setting and rendered out to its config. These attributes'
+  correct Dnsmasq setting and rendered out to its config. These properties'
 values can be `true`, `false`, integers, strings, arrays, or hashes.
 
 ***dnsmasq_local_service***
@@ -191,16 +191,16 @@ Actions:
 | `:stop`    | Stop the service                                   |
 | `:restart` | Restart the service                                |
 
-Attributes:
+Properties:
 
-| Attribute | Default                      | Description                |
-|-----------|------------------------------|----------------------------|
-| options   | See below                    | A complete options hash \* |
-| \*        | `nil`                        | Varies                     |
-| action    | `[:create, :enable, :start]` | Action(s) to perform       |
+| Property | Default                      | Description                |
+|----------|------------------------------|----------------------------|
+| options  | See below                    | A complete options hash \* |
+| \*       | `nil`                        | Varies                     |
+| action   | `[:create, :enable, :start]` | Action(s) to perform       |
 
 \* Command line options can be passed in either as one complete `options` hash,
-   or as individual attribute calls for each option.
+   or as individual property calls for each option.
 
 Contributing
 ============
