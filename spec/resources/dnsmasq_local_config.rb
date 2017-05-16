@@ -7,8 +7,8 @@ shared_context 'resources::dnsmasq_local_config' do
   include_context 'resources'
 
   let(:resource) { 'dnsmasq_local_config' }
-  %i[config].each { |p| let(p) { nil } }
-  let(:properties) { { config: config } }
+  %i[filename config].each { |p| let(p) { nil } }
+  let(:properties) { { filename: filename, config: config } }
   let(:name) { 'default' }
 
   shared_context 'the :create action' do
@@ -19,6 +19,10 @@ shared_context 'resources::dnsmasq_local_config' do
   end
 
   shared_context 'all default properties' do
+  end
+
+  shared_context 'an overridden filename property' do
+    let(:filename) { 'monkeypants.conf' }
   end
 
   shared_context 'an overridden config property' do
@@ -85,7 +89,25 @@ shared_context 'resources::dnsmasq_local_config' do
             no-hosts
             query-port=0
           EOH
-          expect(chef_run).to create_file('/etc/dnsmasq.d/dns.conf')
+          expect(chef_run).to create_file('/etc/dnsmasq.d/default.conf')
+            .with(content: expected)
+        end
+      end
+
+      context 'an overridden filename property' do
+        include_context description
+
+        it 'generates the expected config' do
+          expected = <<-EOH.gsub(/^ +/, '').strip
+            # This file is managed by Chef.
+            # Any changes to it will be overwritten.
+            bind-interfaces
+            cache-size=0
+            interface=
+            no-hosts
+            query-port=0
+          EOH
+          expect(chef_run).to create_file('/etc/dnsmasq.d/monkeypants.conf')
             .with(content: expected)
         end
       end
@@ -103,7 +125,7 @@ shared_context 'resources::dnsmasq_local_config' do
             example=elpmaxe
             interface=docker0
           EOH
-          expect(chef_run).to create_file('/etc/dnsmasq.d/dns.conf')
+          expect(chef_run).to create_file('/etc/dnsmasq.d/default.conf')
             .with(content: expected)
         end
       end
@@ -126,7 +148,7 @@ shared_context 'resources::dnsmasq_local_config' do
             server=8.8.8.8
             server=8.8.4.4
           EOH
-          expect(chef_run).to create_file('/etc/dnsmasq.d/dns.conf')
+          expect(chef_run).to create_file('/etc/dnsmasq.d/default.conf')
             .with(content: expected)
         end
       end
@@ -145,9 +167,79 @@ shared_context 'resources::dnsmasq_local_config' do
   context 'the :remove action' do
     include_context description
 
-    it 'deletes the dnsmasq.d directory' do
-      expect(chef_run).to delete_directory('/etc/dnsmasq.d')
-        .with(recursive: true)
+    let(:other_conf_files?) { nil }
+
+    before do
+      allow(Dir).to receive(:exist?).and_call_original
+      allow(Dir).to receive(:exist?).with('/etc/dnsmasq.d').and_return(true)
+      allow(Dir).to receive(:entries).and_call_original
+      allow(Dir).to receive(:entries)
+        .with('/etc/dnsmasq.d')
+        .and_return(other_conf_files? ? %w[. .. thing2.conf] : %w[. ..])
+    end
+
+    shared_examples_for 'any property set' do
+      it 'deletes the config file' do
+        expect(chef_run).to delete_file(
+          "/etc/dnsmasq.d/#{filename || 'default.conf'}"
+        )
+      end
+    end
+
+    shared_examples_for 'an empty conf.d dir' do
+      it 'deletes the conf.d dir' do
+        expect(chef_run).to delete_directory('/etc/dnsmasq.d')
+      end
+
+      it 'deletes the main config file' do
+        expect(chef_run).to delete_file('/etc/dnsmasq.conf')
+      end
+    end
+
+    shared_examples_for 'a populated conf.d dir' do
+      it 'does not delete the conf.d dir' do
+        expect(chef_run).to_not delete_directory('/etc/dnsmasq.d')
+      end
+
+      it 'does not delete the main config file' do
+        expect(chef_run).to_not delete_file('/etc/dnsmasq.conf')
+      end
+    end
+
+    context 'all default properties' do
+      include_context description
+
+      context 'an empty conf.d dir' do
+        let(:other_conf_files?) { false }
+
+        it_behaves_like 'any property set'
+        it_behaves_like 'an empty conf.d dir'
+      end
+
+      context 'a populated conf.d dir' do
+        let(:other_conf_files?) { true }
+
+        it_behaves_like 'any property set'
+        it_behaves_like 'a populated conf.d dir'
+      end
+    end
+
+    context 'an overridden filename property' do
+      include_context description
+
+      context 'an empty conf.d dir' do
+        let(:other_conf_files?) { false }
+
+        it_behaves_like 'any property set'
+        it_behaves_like 'an empty conf.d dir'
+      end
+
+      context 'a populated conf.d dir' do
+        let(:other_conf_files?) { true }
+
+        it_behaves_like 'any property set'
+        it_behaves_like 'a populated conf.d dir'
+      end
     end
   end
 end

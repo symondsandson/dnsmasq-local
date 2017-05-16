@@ -33,6 +33,16 @@ class Chef # rubocop:disable Style/MultilineIfModifier
       default_action :create
 
       #
+      # The filename for this snippet of config. The resultant path to the
+      # config file will be "/etc/dnsmasq.d/#{filename}".
+      #
+      property :filename,
+               String,
+               default: lazy { |r|
+                 r.name.end_with?('.conf') ? r.name : "#{r.name}.conf"
+               }
+
+      #
       # Set up a default config property hash that can overridden in its
       # entirety by the user passing in a new one. The default config will:
       #
@@ -84,8 +94,7 @@ class Chef # rubocop:disable Style/MultilineIfModifier
       end
 
       #
-      # Create Dnsmasq's config directory and render a dns.conf config file
-      # in it.
+      # Create Dnsmasq's config directory and render a config file in it.
       #
       action :create do
         file '/etc/dnsmasq.conf' do
@@ -97,24 +106,34 @@ class Chef # rubocop:disable Style/MultilineIfModifier
         end
         directory '/etc/dnsmasq.d'
         extras = new_resource.class.state_properties.map(&:name)
-        extras.delete_if { |p| p == :config || new_resource.send(p).nil? }
+        %i[filename config].each { |p| extras.delete(p) }
+        extras.delete_if { |p| new_resource.send(p).nil? }
         merged_config = new_resource.config.merge(
           extras.each_with_object({}) do |p, hsh|
             hsh[p] = new_resource.send(p)
           end
         )
-        file '/etc/dnsmasq.d/dns.conf' do
+        file ::File.join('/etc/dnsmasq.d', new_resource.filename) do
           content config_body_for(merged_config)
         end
       end
 
       #
-      # Delete Dnsmasq's config directory.
+      # Delete Dnsmasq's config file and the config directory if it's empty.
       #
       action :remove do
-        directory '/etc/dnsmasq.d' do
-          recursive true
+        file(::File.join('/etc/dnsmasq.d', new_resource.filename)) do
           action :delete
+        end
+
+        # To make this delete idempotent, we need to take action whether the
+        # config file's already been deleted on a previous run or not.
+        entries = ::Dir.exist?('/etc/dnsmasq.d') && \
+                  ::Dir.entries('/etc/dnsmasq.d')
+        entries.delete(new_resource.filename) if entries
+        if entries && entries.sort == %w[. ..]
+          directory('/etc/dnsmasq.d') { action :delete }
+          file('/etc/dnsmasq.conf') { action :delete }
         end
       end
 

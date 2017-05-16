@@ -56,3 +56,6 @@ suites:
         options:
           all_servers: true
           bad_option: false
+  - name: remove
+    run_list:
+      - recipe[dnsmasq-local_test::remove]

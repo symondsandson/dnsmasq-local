@@ -3,9 +3,12 @@ Dnsmasq Local Cookbook CHANGELOG
 
 Unreleased
 ----------
-- Drop Chef 11 compatibility, test against Chef 13 and 12
+- BREAKING CHANGE: Drop Chef 11 compatibility, test against Chef 13 and 12
+- BREAKING CHANGE: Change the default config file from dns.conf to default.conf
 - Convert all the HWRPs to Chef custom resources
 - Patch the custom resources for Chef 13 compatibility
+- Support multiple config resources with different filename properties
+- Work around an failure condition with the :remove action on RHEL6
 
 v1.1.0 (2016-08-11)
 -------------------
