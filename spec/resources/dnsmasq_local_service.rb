@@ -7,8 +7,8 @@ shared_context 'resources::dnsmasq_local_service' do
   include_context 'resources'
 
   let(:resource) { 'dnsmasq_local_service' }
-  %i[options network_manager_enabled].each { |p| let(p) { nil } }
-  let(:properties) { { options: options } }
+  %i[options environment network_manager_enabled].each { |p| let(p) { nil } }
+  let(:properties) { { options: options, environment: environment } }
   let(:name) { 'default' }
 
   let(:network_manager_running?) { nil }
@@ -55,6 +55,10 @@ shared_context 'resources::dnsmasq_local_service' do
 
   shared_context 'some extra properties' do
     let(:properties) { { thing_1: true, thing_2: 'test', bad: false } }
+  end
+
+  shared_context 'an overridden environment property' do
+    let(:environment) { { PANTS: 'no', SHORTS: 'yes' } }
   end
 
   shared_context 'the NetworkManager service running' do
@@ -131,6 +135,22 @@ shared_context 'resources::dnsmasq_local_service' do
             # This file is managed by Chef.
             # Any changes to it will be overwritten.
             DNSMASQ_OPTS='--thing-1 --thing-2=test'
+          EOH
+          expect(chef_run).to create_file('/etc/default/dnsmasq')
+            .with(content: expected)
+        end
+      end
+
+      context 'an overridden environment property' do
+        include_context description
+
+        it 'generates the expected defaults file' do
+          expected = <<-EOH.gsub(/^ +/, '').strip
+            # This file is managed by Chef.
+            # Any changes to it will be overwritten.
+            DNSMASQ_OPTS=''
+            PANTS='no'
+            SHORTS='yes'
           EOH
           expect(chef_run).to create_file('/etc/default/dnsmasq')
             .with(content: expected)

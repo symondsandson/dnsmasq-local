@@ -22,8 +22,10 @@
 
 config = node['dnsmasq_local']['config']
 options = node['dnsmasq_local']['options']
+environment = node['dnsmasq_local']['environment']
 
 dnsmasq_local 'default' do
   config config unless config.empty?
   options options unless options.empty?
+  environment environment unless environment.empty?
 end

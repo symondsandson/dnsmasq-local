@@ -7,8 +7,10 @@ shared_context 'resources::dnsmasq_local' do
   include_context 'resources'
 
   let(:resource) { 'dnsmasq_local' }
-  %i[config options].each { |p| let(p) { nil } }
-  let(:properties) { { config: config, options: options } }
+  %i[config options environment].each { |p| let(p) { nil } }
+  let(:properties) do
+    { config: config, options: options, environment: environment }
+  end
   let(:name) { 'default' }
 
   shared_context 'the :create action' do
@@ -27,6 +29,10 @@ shared_context 'resources::dnsmasq_local' do
 
   shared_context 'an overridden options property' do
     let(:options) { { example: 'elpmaxe' } }
+  end
+
+  shared_context 'an overridden environment property' do
+    let(:environment) { { 'EXAMPLE' => 'elpmaxe' } }
   end
 
   shared_examples_for 'any platform' do
@@ -58,7 +64,7 @@ shared_context 'resources::dnsmasq_local' do
 
         it 'creates, enables, and starts the dnsmasq_local_service' do
           expect(chef_run).to create_dnsmasq_local_service('default')
-            .with(options.to_h)
+            .with(options.to_h.merge(environment: environment.to_h))
           expect(chef_run).to enable_dnsmasq_local_service('default')
           expect(chef_run).to start_dnsmasq_local_service('default')
         end
@@ -77,6 +83,12 @@ shared_context 'resources::dnsmasq_local' do
       end
 
       context 'an overridden options property' do
+        include_context description
+
+        it_behaves_like 'any property set'
+      end
+
+      context 'an overridden environment property' do
         include_context description
 
         it_behaves_like 'any property set'

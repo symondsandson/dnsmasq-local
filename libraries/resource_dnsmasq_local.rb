@@ -43,6 +43,12 @@ class Chef
       property :options, Hash, default: {}
 
       #
+      # Support passing other environment variables that'll end up in the
+      # `/etc/default/dnsmasq` file.
+      #
+      property :environment, Hash, default: {}
+
+      #
       # Install and configure Dnsmasq. Drop in the config first so DNS
       # doesn't break in the event of an unusable default config.
       #
@@ -56,6 +62,9 @@ class Chef
         end
         dnsmasq_local_service new_resource.name do
           new_resource.options.each { |k, v| send(k, v) }
+          unless new_resource.environment.empty?
+            environment new_resource.environment
+          end
           notifies :restart, "dnsmasq_local_service[#{new_resource.name}]"
         end
       end
