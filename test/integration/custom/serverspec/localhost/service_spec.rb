@@ -10,6 +10,7 @@ describe 'dnsmasq-local::custom::service' do
         # This file is managed by Chef.
         # Any changes to it will be overwritten.
         DNSMASQ_OPTS='--all-servers'
+        FAKE='certainly'
       EOH
       expect(subject.content).to eq(expected)
     end

@@ -36,6 +36,7 @@ group :deploy do
 end
 
 group :production do
-  gem 'berkshelf'
+  gem 'berkshelf',
+      ('< 6' if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('2.3.3'))
   gem 'chef', '>= 12.5'
 end

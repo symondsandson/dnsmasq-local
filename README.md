@@ -68,6 +68,11 @@ must be used, with the same underscore and boolean rules as for the config:
     default['dnsmasq_local']['options']['bind_dynamic'] = true
     default['dnsmasq_local']['options']['enable_dbus'] = 'com.example'
 
+The environment attribute hash can be used for setting any other environment
+variables that should populate the `/etc/default/dnsmasq` file:
+
+  default['dnsmasq_local']['environment']['IGNORE_RESOLVCONF'] = 'yes'
+
 Resources
 =========
 
@@ -80,6 +85,7 @@ Syntax:
     dnsmasq_local 'default' do
       config(cache_size: 0)
       options(bind_dynamic: true)
+      environment(IGNORE_RESOLVCONF: 'yes')
       action :create
     end
 
@@ -92,11 +98,12 @@ Actions:
 
 Properties:
 
-| Property | Default   | Description                         |
-|----------|-----------|-------------------------------------|
-| config   | `nil`     | A Dnsmasq configuration hash        |
-| options  | `nil`     | A Dnsmasq command line options hash |
-| Action   | `:create` | Action(s) to perform                |
+| Property    | Default   | Description                           |
+|-------------|-----------|---------------------------------------|
+| config      | `nil`     | A Dnsmasq configuration hash          |
+| options     | `nil`     | A Dnsmasq command line options hash   |
+| environment | `{}`      | A hash of other environment variables |
+| action      | `:create` | Action(s) to perform                  |
 
 ***dnsmasq_local_app***
 
@@ -176,6 +183,7 @@ Syntax:
     dnsmasq_local_service 'default' do
       options(bind_dynamic: true)
       enable_dbus 'com.example'
+      environment(IGNORE_RESOLVCONF: 'yes')
       action [:create, :enable, :start]
     end
 
@@ -193,11 +201,12 @@ Actions:
 
 Properties:
 
-| Property | Default                      | Description                |
-|----------|------------------------------|----------------------------|
-| options  | See below                    | A complete options hash \* |
-| \*       | `nil`                        | Varies                     |
-| action   | `[:create, :enable, :start]` | Action(s) to perform       |
+| Property    | Default                      | Description                 |
+|-------------|------------------------------|-----------------------------|
+| options     | See below                    | A complete options hash \*  |
+| \*          | `nil`                        | Varies                      |
+| environment | `{}`                         | Other environment variables |
+| action      | `[:create, :enable, :start]` | Action(s) to perform        |
 
 \* Command line options can be passed in either as one complete `options` hash,
    or as individual property calls for each option.

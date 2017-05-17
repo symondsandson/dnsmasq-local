@@ -54,8 +54,16 @@ class Chef # rubocop:disable Style/MultilineIfModifier
       property :options, Hash, default: {}
 
       #
+      # Supporting populating the `/etc/default/dnsmasq` file with any other
+      # arbitrary environment variables. It is up to the user to ensure the
+      # variables are valid and used by the version of Dnsmasq on their
+      # platform.
+      #
+      property :environment, Hash, default: {}
+
+      #
       # Allow individual properties to be fed in and merged with the default
-      # options without blowing away the entire hash.
+      # command line options without blowing away the entire hash.
       #
       # (see Chef::Resource#method_missing)
       #
@@ -93,14 +101,17 @@ class Chef # rubocop:disable Style/MultilineIfModifier
           end
         end
         extras = new_resource.class.state_properties.map(&:name)
-        extras.delete_if { |p| p == :options || new_resource.send(p).nil? }
+        extras.delete(:options)
+        extras.delete(:environment)
+        extras.delete_if { |p| new_resource.send(p).nil? }
         merged_options = new_resource.options.merge(
           extras.each_with_object({}) do |p, hsh|
             hsh[p] = new_resource.send(p)
           end
         )
         file '/etc/default/dnsmasq' do
-          content(defaults_file_content(merged_options))
+          content(defaults_file_content(merged_options,
+                                        new_resource.environment))
         end
       end
 
@@ -139,21 +150,47 @@ class Chef # rubocop:disable Style/MultilineIfModifier
       #
       # Return a rendered /etc/default/dnsmasq based on a set of options.
       #
-      # @param opts [Hash] a set of dnsmasq defaults
+      # @param opts [Hash] a set of dnsmasq command line options
+      # @param env [Hash] a set of other environment variables
       #
-      def defaults_file_content(opts)
-        header = <<-EOH.gsub(/^ +/, '')
+      def defaults_file_content(opts, env)
+        header = <<-EOH.gsub(/^ +/, '').rstrip
           # This file is managed by Chef.
           # Any changes to it will be overwritten.
         EOH
-        opts_str = opts.map do |k, v|
+        [
+          header, options_string(opts), environment_string(env)
+        ].compact.join("\n")
+      end
+
+      #
+      # Render the options hash as a string.
+      #
+      # @param opts [Hash] the contents of the options property
+      #
+      # @return [String] that hash rendered for file output
+      #
+      def options_string(opts)
+        str_list = opts.map do |k, v|
           if v == true
             "--#{k.to_s.tr('_', '-')}"
           elsif v
             "--#{k.to_s.tr('_', '-')}=#{v}"
           end
-        end.compact.join(' ')
-        header + "DNSMASQ_OPTS='#{opts_str}'"
+        end.compact
+        "DNSMASQ_OPTS='#{str_list.join(' ')}'"
+      end
+
+      #
+      # Render the environment hash as a string.
+      #
+      # @param env [Hash] the contents of the environment property
+      #
+      # @return [String, NilClass] that hash rendered for file output or nil
+      #
+      def environment_string(env)
+        return nil if env.empty?
+        env.map { |k, v| "#{k}='#{v}'" }.join("\n")
       end
     end
   end
