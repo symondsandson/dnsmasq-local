@@ -1,8 +1,8 @@
 Dnsmasq Local Cookbook CHANGELOG
 ================================
 
-Unreleased
-----------
+v2.0.0 (2017-05-18)
+-------------------
 - BREAKING CHANGE: Drop Chef 11 compatibility, test against Chef 13 and 12
 - BREAKING CHANGE: Change the default config file from dns.conf to default.conf
 - Convert all the HWRPs to Chef custom resources
