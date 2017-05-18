@@ -57,9 +57,17 @@ class Chef # rubocop:disable Style/MultilineIfModifier
       # Supporting populating the `/etc/default/dnsmasq` file with any other
       # arbitrary environment variables. It is up to the user to ensure the
       # variables are valid and used by the version of Dnsmasq on their
-      # platform.
+      # platform. The only environment variable that cannot be set here is
+      # DNSMASQ_OPTS, as that is controlled by the options property above.
       #
-      property :environment, Hash, default: {}
+      property :environment,
+               Hash,
+               default: {},
+               callbacks: {
+                 'Invalid environment variable: DNSMASQ_OPTS' => lambda { |v|
+                   !v.keys.map(&:to_s).include?('DNSMASQ_OPTS')
+                 }
+               }
 
       #
       # Allow individual properties to be fed in and merged with the default

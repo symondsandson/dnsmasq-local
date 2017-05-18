@@ -61,6 +61,10 @@ shared_context 'resources::dnsmasq_local_service' do
     let(:environment) { { PANTS: 'no', SHORTS: 'yes' } }
   end
 
+  shared_context 'an invalid environment property' do
+    let(:environment) { { PANTS: 'no', SHORTS: 'yes', DNSMASQ_OPTS: '--bad' } }
+  end
+
   shared_context 'the NetworkManager service running' do
     let(:network_manager_running?) { true }
   end
@@ -154,6 +158,14 @@ shared_context 'resources::dnsmasq_local_service' do
           EOH
           expect(chef_run).to create_file('/etc/default/dnsmasq')
             .with(content: expected)
+        end
+      end
+
+      context 'an invalid environment property' do
+        include_context description
+
+        it 'raises an error' do
+          expect { chef_run }.to raise_error(Chef::Exceptions::ValidationFailed)
         end
       end
 
