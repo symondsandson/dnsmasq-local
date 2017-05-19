@@ -3,6 +3,7 @@ Dnsmasq Local Cookbook CHANGELOG
 
 Unreleased
 ----------
+- Run app, config, and service resources in the root run context
 
 v2.0.0 (2017-05-18)
 -------------------

@@ -53,19 +53,21 @@ class Chef
       # doesn't break in the event of an unusable default config.
       #
       action :create do
-        dnsmasq_local_config new_resource.name do
-          new_resource.config.each { |k, v| send(k, v) }
-          notifies :restart, "dnsmasq_local_service[#{new_resource.name}]"
-        end
-        dnsmasq_local_app new_resource.name do
-          notifies :restart, "dnsmasq_local_service[#{new_resource.name}]"
-        end
-        dnsmasq_local_service new_resource.name do
-          new_resource.options.each { |k, v| send(k, v) }
-          unless new_resource.environment.empty?
-            environment new_resource.environment
+        with_run_context :root do
+          dnsmasq_local_config new_resource.name do
+            new_resource.config.each { |k, v| send(k, v) }
+            notifies :restart, "dnsmasq_local_service[#{new_resource.name}]"
           end
-          notifies :restart, "dnsmasq_local_service[#{new_resource.name}]"
+          dnsmasq_local_app new_resource.name do
+            notifies :restart, "dnsmasq_local_service[#{new_resource.name}]"
+          end
+          dnsmasq_local_service new_resource.name do
+            new_resource.options.each { |k, v| send(k, v) }
+            unless new_resource.environment.empty?
+              environment new_resource.environment
+            end
+            notifies :restart, "dnsmasq_local_service[#{new_resource.name}]"
+          end
         end
       end
 
@@ -73,11 +75,13 @@ class Chef
       # Uninstall Dnsmasq and any configs.
       #
       action :remove do
-        dnsmasq_local_service new_resource.name do
-          action %i[stop disable remove]
+        with_run_context :root do
+          dnsmasq_local_service new_resource.name do
+            action %i[stop disable remove]
+          end
+          dnsmasq_local_config(new_resource.name) { action :remove }
+          dnsmasq_local_app(new_resource.name) { action :remove }
         end
-        dnsmasq_local_config(new_resource.name) { action :remove }
-        dnsmasq_local_app(new_resource.name) { action :remove }
       end
     end
   end

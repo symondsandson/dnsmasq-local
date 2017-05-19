@@ -18,7 +18,7 @@ Requirements
 
 This cookbook currently supports both Debian-based and RHEL-based platforms.
 
-It now requires Chef 12.5+.
+It now requires Chef 12.10+, or Chef 12.1+ and the compat_resource cookbook.
 
 Usage
 =====
