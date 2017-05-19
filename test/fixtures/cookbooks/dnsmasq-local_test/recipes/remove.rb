@@ -3,9 +3,9 @@
 
 include_recipe '::_prep'
 
-dnsmasq_local_config '_default'
-dnsmasq_local_app '_default'
-dnsmasq_local_service '_default'
+dnsmasq_local_config 'default'
+dnsmasq_local_app 'default'
+dnsmasq_local_service 'default'
 
 dnsmasq_local 'default' do
   action :remove

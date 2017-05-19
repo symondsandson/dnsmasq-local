@@ -38,7 +38,7 @@ class Chef
       #
       action :remove do
         rpm_package 'dnsmasq' do
-          options '--noscripts' if node['platform_version'].to_i < 7
+          options '--noscripts'
           action :remove
         end
       end
