@@ -1,8 +1,8 @@
 Dnsmasq Local Cookbook CHANGELOG
 ================================
 
-Unreleased
-----------
+v2.1.0 (2017-05-20)
+-------------------
 - Run app, config, and service resources in the root run context
 
 v2.0.0 (2017-05-18)
