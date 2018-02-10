@@ -6,10 +6,21 @@ branches:
 
 sudo: required
 
+addons:
+  apt:
+    sources:
+      - chef-current-trusty
+    packages:
+      - chefdk
+
 services:
   - docker
 
+install:
+  - chef exec bundle install --without=development
+
 env:
+  - SUITE=unit
   - SUITE=default PLATFORM=ubuntu
   - SUITE=default PLATFORM=debian
   - SUITE=default PLATFORM=centos
@@ -20,12 +31,34 @@ env:
   - SUITE=remove PLATFORM=debian
   - SUITE=remove PLATFORM=centos
 
-install:
-  - curl -L https://www.chef.io/chef/install.sh | sudo bash -s -- -P chefdk
-  - chef exec bundle install --without=development integration
-
-before_script:
-  - cp .kitchen.travis.yml .kitchen.local.yml
-
 script:
-  - chef exec bundle exec rake && chef exec bundle exec kitchen test $SUITE-$PLATFORM-
+  - if test "$SUITE" = "unit"; then chef exec rake; fi
+  - if test "$SUITE" != "unit"; then chef exec kitchen test $SUITE-$PLATFORM; fi
+
+stages:
+  - name: test
+  - name: deploy
+    if: NOT type = cron AND branch = master
+
+jobs:
+  include:
+    - stage: deploy
+      env:
+      script: skip
+      before_deploy:
+        - openssl aes-256-cbc -K $encrypted_89a22a84bf73_key -iv $encrypted_89a22a84bf73_iv -in .travis/configs.tar.gz.enc -out .travis/configs.tar.gz -d
+        - tar xzf .travis/configs.tar.gz
+        - cp .travis/id_rsa ~/.ssh/
+        - chmod 0600 ~/.ssh/id_rsa
+        - git remote set-url origin git@github.com:socrata-cookbooks/dnsmasq-local
+      deploy:
+        provider: script
+        script: chef exec stove --username socrata --key .travis/client.pem
+        skip_cleanup: true
+
+notifications:
+  slack:
+    on_failure: change
+    on_success: never
+    rooms:
+      - secure: HKwG4LvXb581idvWNmBGp7CjhuRSIsGII7MfDiZgrNMWui/l0ZNNV1yTARKTkT9pR1YSeiSFVN4oqCveRXnYNG7TNIY2GMQx5AxM/wAilzMfVthVMWC88LIsyV870n2xIV8v9Oe/VQF05xmgAL0zRmkoZ952JdOQ0iDnNVUdw3paPJOmLqWKjxE/KBl/pxA+QkdkSASyFJgc76PcM2vPIQR+QGq69HpGxk6lpK1mYCFi6gK+YgSge7d9uJkUcP1ieaRnRoEiuxLhuSmBiHMdz+yLLH1z3Kdf8JKR9PizIpV61MTyb4+Rugn/HTKex0q3GMXBZbyPF/IzniuUKPmz+jcW6yHudt8qH4kNxmdDbsXN96yrnOKLoIn/DMW6zEHh4eabjGTKRaUpP+sl6kGK7FM1Wb19Kbgpv2GOamW7ZtPFCgNPT9OMrI/T7sMR1MkCde4wpqC8N2FTGf4dYcVwAg5aX8VJwacsGRNGrGcZk+mu5Nm+Tsci6rwO7EC3SAnFmfW07R9AGjZE/WZzgs5oQaCu2C4zYkt1OLEbOpWbdQkosVVdbSWihdqewa0UUbzpQp9wVmoFA61kjLaN2J2wT97tdmxTp1OZFzJzEg4ifYZDaFUWwUwYlK5PSUyi5HOrSloDYe1oE1bvuENiP+1yoldc+JzvNvvxGgpuX8AvBU0=
