@@ -52,7 +52,7 @@ class Chef
       # doesn't break in the event of an unusable default config.
       #
       action :create do
-        with_run_context :root do
+        with_run_context new_resource.run_context do
           dnsmasq_local_config new_resource.name do
             new_resource.config.each { |k, v| send(k, v) }
             notifies :restart, "dnsmasq_local_service[#{new_resource.name}]"
@@ -74,7 +74,7 @@ class Chef
       # Uninstall Dnsmasq and any configs.
       #
       action :remove do
-        with_run_context :root do
+        with_run_context new_resource.run_context do
           dnsmasq_local_service new_resource.name do
             action %i[stop disable remove]
           end

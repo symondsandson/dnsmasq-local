@@ -6,6 +6,7 @@ cookbook.
 ## v2.2.0 (2018-02-09)
 
 - Resolve all new style offenses
+- Run sub-resources in the main resource's run context instead of root
 
 ## v2.1.0 (2017-05-20)
 
