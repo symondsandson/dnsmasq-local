@@ -1,5 +1,5 @@
-Dnsmasq Local Cookbook
-======================
+# Dnsmasq Local Cookbook
+
 [![Cookbook Version](https://img.shields.io/cookbook/v/dnsmasq-local.svg)][cookbook]
 [![Build Status](https://img.shields.io/travis/socrata-cookbooks/dnsmasq-local.svg)][travis]
 [![Code Climate](https://img.shields.io/codeclimate/github/socrata-cookbooks/dnsmasq-local.svg)][codeclimate]
@@ -13,28 +13,24 @@ Dnsmasq Local Cookbook
 Installs Dnsmasq with an opinionated default configuration geared toward
 localhost-only improved DNS reliability.
 
-Requirements
-============
+## Requirements
 
 This cookbook currently supports both Debian-based and RHEL-based platforms.
 
 It now requires Chef 12.10+, or Chef 12.1+ and the compat_resource cookbook.
 
-Usage
-=====
+## Usage
 
 Set the attributes you wish and add the default recipe to your run list, or
 create a recipe of your own that implements the included Chef resources.
 
-Recipes
-=======
+## Recipes
 
 ***default***
 
 Installs and configures Dnsmasq in an attribute-driven fashion.
 
-Attributes
-==========
+## Attributes
 
 ***default***
 
@@ -73,8 +69,7 @@ variables that should populate the `/etc/default/dnsmasq` file:
 
   default['dnsmasq_local']['environment']['IGNORE_RESOLVCONF'] = 'yes'
 
-Resources
-=========
+## Resources
 
 ***dnsmasq_local***
 
@@ -211,30 +206,6 @@ Properties:
 \* Command line options can be passed in either as one complete `options` hash,
    or as individual property calls for each option.
 
-Contributing
-============
+## Maintainers
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Add tests for the new feature; ensure they pass (`rake`)
-4. Commit your changes (`git commit -am 'Add some feature'`)
-5. Push to the branch (`git push origin my-new-feature`)
-6. Create a new Pull Request
-
-License & Authors
-=================
-- Author: Jonathan Hartman <jonathan.hartman@socrata.com>
-
-Copyright 2016, Socrata, Inc.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+- Jonathan Hartman <jonathan.hartman@socrata.com>

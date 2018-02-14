@@ -1,41 +1,63 @@
 ---
 driver:
-  name: vagrant
+  name: dokken
+  privileged: true
+
+transport:
+  name: dokken
 
 provisioner:
-  name: chef_zero
+  name: dokken
+
+verifier:
+  name: inspec
+  root_path: /opt/verifier
+  sudo: false
 
 platforms:
-  - name: ubuntu-16.04
-  - name: ubuntu-14.04
-  - name: debian-8.7
-  - name: centos-7.3
-  - name: centos-6.9
-  - name: ubuntu-16.04-chef-12
+  <% %w[13.7.20 12].each do |chef| %>
+  - name: ubuntu-16.04-chef-<%= chef %>
     driver:
-      box: bento/ubuntu-16.04
-    provisioner:
-      require_chef_omnibus: 12
-  - name: ubuntu-14.04-chef-12
+      image: ubuntu:16.04
+      chef_version: <%= chef %>
+      pid_one_command: /lib/systemd/systemd
+  - name: ubuntu-14.04-chef-<%= chef %>
     driver:
-      box: bento/ubuntu-14.04
-    provisioner:
-      require_chef_omnibus: 12
-  - name: debian-8.7-chef-12
+      image: ubuntu:14.04
+      chef_version: <%= chef %>
+      pid_one_command: /sbin/init
+      intermediate_instructions:
+        - RUN dpkg-divert --remove /sbin/initctl
+        - RUN ln -sf /sbin/initctl.distrib /sbin/initctl
+  - name: debian-9-chef-<%= chef %>
     driver:
-      box: bento/debian-8.7
-    provisioner:
-      require_chef_omnibus: 12
-  - name: centos-7.3-chef-12
+      image: debian:9
+      chef_version: <%= chef %>
+      pid_one_command: /lib/systemd/systemd
+      intermediate_instructions:
+        - RUN echo DISTRIB_CODENAME=stretch > /etc/lsb-release
+        - RUN apt-get update
+        - RUN apt-get -y install systemd gnupg
+  - name: debian-8-chef-<%= chef %>
     driver:
-      box: bento/centos-7.3
-    provisioner:
-      require_chef_omnibus: 12
-  - name: centos-6.9-chef-12
+      image: debian:8
+      chef_version: <%= chef %>
+      pid_one_command: /lib/systemd/systemd
+      intermediate_instructions:
+       - RUN echo DISTRIB_CODENAME=jessie > /etc/lsb-release
+  - name: centos-7-chef-<%= chef %>
     driver:
-      box: bento/centos-6.9
-    provisioner:
-      require_chef_omnibus: 12
+      image: centos:7
+      chef_version: <%= chef %>
+      pid_one_command: /lib/systemd/systemd
+  - name: centos-6-chef-<%= chef %>
+    driver:
+      image: centos:6
+      chef_version: <%= chef %>
+      pid_one_command: /sbin/init
+      intermediate_instructions:
+        - RUN yum -y install upstart initscripts
+  <% end %>
 
 suites:
   - name: default

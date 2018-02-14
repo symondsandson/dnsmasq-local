@@ -1,4 +1,3 @@
-# encoding: utf-8
 # frozen_string_literal: true
 
 require_relative '../resources'
@@ -60,11 +59,11 @@ shared_context 'resources::dnsmasq_local_config' do
 
       shared_examples_for 'any property set' do
         it 'creates the main dnsmasq.conf file' do
-          expected = <<-EOH.gsub(/^ +/, '').strip
+          expected = <<-EXP.gsub(/^ +/, '').strip
             # This file is managed by Chef.
             # Any changes to it will be overwritten.
             conf-dir=/etc/dnsmasq.d
-          EOH
+          EXP
           expect(chef_run).to create_file('/etc/dnsmasq.conf')
             .with(content: expected)
         end
@@ -80,7 +79,7 @@ shared_context 'resources::dnsmasq_local_config' do
         it_behaves_like 'any property set'
 
         it 'generates the expected config' do
-          expected = <<-EOH.gsub(/^ +/, '').strip
+          expected = <<-EXP.gsub(/^ +/, '').strip
             # This file is managed by Chef.
             # Any changes to it will be overwritten.
             bind-interfaces
@@ -88,7 +87,7 @@ shared_context 'resources::dnsmasq_local_config' do
             interface=
             no-hosts
             query-port=0
-          EOH
+          EXP
           expect(chef_run).to create_file('/etc/dnsmasq.d/default.conf')
             .with(content: expected)
         end
@@ -98,7 +97,7 @@ shared_context 'resources::dnsmasq_local_config' do
         include_context description
 
         it 'generates the expected config' do
-          expected = <<-EOH.gsub(/^ +/, '').strip
+          expected = <<-EXP.gsub(/^ +/, '').strip
             # This file is managed by Chef.
             # Any changes to it will be overwritten.
             bind-interfaces
@@ -106,7 +105,7 @@ shared_context 'resources::dnsmasq_local_config' do
             interface=
             no-hosts
             query-port=0
-          EOH
+          EXP
           expect(chef_run).to create_file('/etc/dnsmasq.d/monkeypants.conf')
             .with(content: expected)
         end
@@ -118,13 +117,13 @@ shared_context 'resources::dnsmasq_local_config' do
         it_behaves_like 'any property set'
 
         it 'generates the expected config' do
-          expected = <<-EOH.gsub(/^ +/, '').strip
+          expected = <<-EXP.gsub(/^ +/, '').strip
             # This file is managed by Chef.
             # Any changes to it will be overwritten.
             bool
             example=elpmaxe
             interface=docker0
-          EOH
+          EXP
           expect(chef_run).to create_file('/etc/dnsmasq.d/default.conf')
             .with(content: expected)
         end
@@ -136,7 +135,7 @@ shared_context 'resources::dnsmasq_local_config' do
         it_behaves_like 'any property set'
 
         it 'generates the expected config' do
-          expected = <<-EOH.gsub(/^ +/, '').strip
+          expected = <<-EXP.gsub(/^ +/, '').strip
             # This file is managed by Chef.
             # Any changes to it will be overwritten.
             bind-interfaces
@@ -147,7 +146,7 @@ shared_context 'resources::dnsmasq_local_config' do
             query-port=0
             server=8.8.8.8
             server=8.8.4.4
-          EOH
+          EXP
           expect(chef_run).to create_file('/etc/dnsmasq.d/default.conf')
             .with(content: expected)
         end

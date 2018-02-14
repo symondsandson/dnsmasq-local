@@ -1,4 +1,3 @@
-# encoding: utf-8
 # frozen_string_literal: true
 
 require_relative '../resources'
@@ -77,11 +76,11 @@ shared_context 'resources::dnsmasq_local_service' do
         include_context description
 
         it 'generates the expected defaults file' do
-          expected = <<-EOH.gsub(/^ +/, '').strip
+          expected = <<-EXP.gsub(/^ +/, '').strip
             # This file is managed by Chef.
             # Any changes to it will be overwritten.
             DNSMASQ_OPTS=''
-          EOH
+          EXP
           expect(chef_run).to create_file('/etc/default/dnsmasq')
             .with(content: expected)
         end
@@ -107,11 +106,11 @@ shared_context 'resources::dnsmasq_local_service' do
         include_context description
 
         it 'creates the defaults file' do
-          expected = <<-EOH.gsub(/^ +/, '').strip
+          expected = <<-EXP.gsub(/^ +/, '').strip
             # This file is managed by Chef.
             # Any changes to it will be overwritten.
             DNSMASQ_OPTS=''
-          EOH
+          EXP
           expect(chef_run).to create_file('/etc/default/dnsmasq')
             .with(content: expected)
         end
@@ -121,11 +120,11 @@ shared_context 'resources::dnsmasq_local_service' do
         include_context description
 
         it 'generates the expected defaults file' do
-          expected = <<-EOH.gsub(/^ +/, '').strip
+          expected = <<-EXP.gsub(/^ +/, '').strip
             # This file is managed by Chef.
             # Any changes to it will be overwritten.
             DNSMASQ_OPTS='--thing-1 --thing-2=test'
-          EOH
+          EXP
           expect(chef_run).to create_file('/etc/default/dnsmasq')
             .with(content: expected)
         end
@@ -135,11 +134,11 @@ shared_context 'resources::dnsmasq_local_service' do
         include_context description
 
         it 'generates the expected defaults file' do
-          expected = <<-EOH.gsub(/^ +/, '').strip
+          expected = <<-EXP.gsub(/^ +/, '').strip
             # This file is managed by Chef.
             # Any changes to it will be overwritten.
             DNSMASQ_OPTS='--thing-1 --thing-2=test'
-          EOH
+          EXP
           expect(chef_run).to create_file('/etc/default/dnsmasq')
             .with(content: expected)
         end
@@ -149,13 +148,13 @@ shared_context 'resources::dnsmasq_local_service' do
         include_context description
 
         it 'generates the expected defaults file' do
-          expected = <<-EOH.gsub(/^ +/, '').strip
+          expected = <<-EXP.gsub(/^ +/, '').strip
             # This file is managed by Chef.
             # Any changes to it will be overwritten.
             DNSMASQ_OPTS=''
             PANTS='no'
             SHORTS='yes'
-          EOH
+          EXP
           expect(chef_run).to create_file('/etc/default/dnsmasq')
             .with(content: expected)
         end
@@ -184,11 +183,11 @@ shared_context 'resources::dnsmasq_local_service' do
         end
 
         it 'creates the defaults file' do
-          expected = <<-EOH.gsub(/^ +/, '').strip
+          expected = <<-EXP.gsub(/^ +/, '').strip
             # This file is managed by Chef.
             # Any changes to it will be overwritten.
             DNSMASQ_OPTS=''
-          EOH
+          EXP
           expect(chef_run).to create_file('/etc/default/dnsmasq')
             .with(content: expected)
         end
