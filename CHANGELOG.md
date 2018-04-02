@@ -3,6 +3,10 @@
 This file is used to list changes made in each version of the dnsmasq-local
 cookbook.
 
+## v2.2.1 (2018-04-02)
+
+- Resolve a new style offense
+
 ## v2.2.0 (2018-02-09)
 
 - Resolve all new style offenses
