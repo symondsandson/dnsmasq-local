@@ -2,13 +2,9 @@
 
 [![Cookbook Version](https://img.shields.io/cookbook/v/dnsmasq-local.svg)][cookbook]
 [![Build Status](https://img.shields.io/travis/socrata-cookbooks/dnsmasq-local.svg)][travis]
-[![Code Climate](https://img.shields.io/codeclimate/github/socrata-cookbooks/dnsmasq-local.svg)][codeclimate]
-[![Coverage Status](https://img.shields.io/coveralls/socrata-cookbooks/dnsmasq-local.svg)][coveralls]
 
 [cookbook]: https://supermarket.chef.io/cookbooks/dnsmasq-local
 [travis]: https://travis-ci.org/socrata-cookbooks/dnsmasq-local
-[codeclimate]: https://codeclimate.com/github/socrata-cookbooks/dnsmasq-local
-[coveralls]: https://coveralls.io/r/socrata-cookbooks/dnsmasq-local
 
 Installs Dnsmasq with an opinionated default configuration geared toward
 localhost-only improved DNS reliability.
