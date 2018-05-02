@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-name 'dnsmasq-local_test'
+name 'test'
 maintainer 'Socrata Engineering'
 maintainer_email 'sysadmin@socrata.com'
 license 'Apache-2.0'
-description 'dnsmasq-local_test'
-long_description 'dnsmasq-local_test'
+description 'test'
+long_description 'test'
 version '0.0.1'
 
 depends 'dnsmasq-local'

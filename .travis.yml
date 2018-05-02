@@ -17,7 +17,7 @@ services:
   - docker
 
 install:
-  - chef exec bundle install --without=development
+  - chef exec bundle install
 
 env:
   - SUITE=unit
@@ -32,7 +32,7 @@ env:
   - SUITE=remove PLATFORM=centos
 
 script:
-  - if test "$SUITE" = "unit"; then chef exec rake; fi
+  - if test "$SUITE" = "unit"; then chef exec delivery local all; fi
   - if test "$SUITE" != "unit"; then chef exec kitchen test $SUITE-$PLATFORM; fi
 
 stages:
