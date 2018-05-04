@@ -5,18 +5,13 @@ branches:
     - master
 
 sudo: required
-
-addons:
-  apt:
-    sources:
-      - chef-current-trusty
-    packages:
-      - chefdk
+dist: xenial
 
 services:
   - docker
 
 install:
+  - curl -L https://omnitruck.chef.io/install.sh | sudo bash -s -- -c current -P chefdk
   - chef exec bundle install
 
 env:
