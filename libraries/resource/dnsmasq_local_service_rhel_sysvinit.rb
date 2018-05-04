@@ -19,17 +19,19 @@
 # limitations under the License.
 #
 
-require_relative 'dnsmasq_local_service_rhel'
+require_relative 'dnsmasq_local_service'
 
 class Chef
   class Resource
     # A Chef resource for Sysvinit RHEL services.
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
-    class DnsmasqLocalServiceRhelSysvinit < DnsmasqLocalServiceRhel
-      provides :dnsmasq_local_service,
-               platform_family: 'rhel',
-               platform_version: '< 7'
+    class DnsmasqLocalServiceRhelSysvinit < DnsmasqLocalService
+      provides :dnsmasq_local_service do |node|
+        node.platform_family?('rhel') && \
+          !Chef::Platform::ServiceHelpers.service_resource_providers
+                                         .include?(:systemd)
+      end
 
       #
       # Patch the RHEL < 7 init script to pass on the DNSMASQ_OPTS environment

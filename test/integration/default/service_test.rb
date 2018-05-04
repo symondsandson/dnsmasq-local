@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 
+describe service('systemd-resolved') do
+  it { should_not be_enabled }
+  it { should_not be_running }
+end
+
 describe file('/etc/default/dnsmasq') do
   its(:content) do
     expected = <<-EXP.gsub(/^ +/, '').strip
