@@ -1,5 +1,11 @@
 <%
 require 'open-uri'
 eval(open('https://raw.githubusercontent.com/socrata-cookbooks/shared/master/files/.kitchen.rb').read)
+
+kc = KitchenConfigurator::Config.new(
+  # TODO: As of 2018-05-04, enabling services with update-rc.d is broken in
+  #       Chef 14.
+  excluded_platforms: %w[ubuntu-14.04-chef-14]
+)
 %>
-<%= KitchenConfigurator::Config.new %>
+<%= kc %>
