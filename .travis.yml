@@ -1,17 +1,23 @@
 language: ruby
+rvm: system
 
 branches:
   only:
     - master
 
 sudo: required
-dist: xenial
+
+addons:
+  apt:
+    sources:
+      - chef-current-trusty
+    packages:
+      - chefdk
 
 services:
   - docker
 
 install:
-  - curl -L https://omnitruck.chef.io/install.sh | sudo bash -s -- -c current -P chefdk
   - chef exec bundle install
 
 env:
@@ -28,7 +34,7 @@ env:
 
 script:
   - if test "$SUITE" = "unit"; then chef exec delivery local all; fi
-  - if test "$SUITE" != "unit"; then chef exec kitchen test $SUITE-$PLATFORM; fi
+  - if test "$SUITE" != "unit"; then chef exec microwave test $SUITE-$PLATFORM; fi
 
 stages:
   - name: test
@@ -48,7 +54,7 @@ jobs:
         - git remote set-url origin git@github.com:socrata-cookbooks/dnsmasq-local
       deploy:
         provider: script
-        script: chef exec stove --username socrata --key .travis/client.pem
+        script: rvm use system do chef exec stove --username socrata --key .travis/client.pem
         skip_cleanup: true
 
 notifications:

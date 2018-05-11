@@ -1,11 +1,11 @@
-<%
-require 'open-uri'
-eval(open('https://raw.githubusercontent.com/socrata-cookbooks/shared/master/files/.kitchen.rb').read)
-
-kc = KitchenConfigurator::Config.new(
-  # TODO: As of 2018-05-04, enabling services with update-rc.d is broken in
-  #       Chef 14.
-  excluded_platforms: %w[ubuntu-14.04-chef-14]
-)
-%>
-<%= kc %>
+---
+# TODO: As of 2018-05-11, enabling services with update-rc.d is broken in Chef
+#       14 and a Ubuntu 18.04 container on a 14.04 host results in issues with
+#       Dnsmasq's/Systemd's use of PID files.
+microwave:
+  excludes:
+    - name: ubuntu
+      version: 14.04
+      chef: 14
+    - name: ubuntu
+      version: 18.04

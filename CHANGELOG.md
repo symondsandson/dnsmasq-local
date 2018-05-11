@@ -7,6 +7,7 @@ cookbook.
 
 - Inherit test configs from a central repo where possible
 - Disable systemd-resolved on Systemd platforms
+- Run integration tests with Microwave
 
 ## v2.2.1 (2018-04-02)
 
