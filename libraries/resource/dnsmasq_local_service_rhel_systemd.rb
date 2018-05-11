@@ -19,17 +19,19 @@
 # limitations under the License.
 #
 
-require_relative 'dnsmasq_local_service_rhel'
+require_relative 'dnsmasq_local_service_systemd'
 
 class Chef
   class Resource
     # A Chef resource for Systemd RHEL services.
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
-    class DnsmasqLocalServiceRhelSystemd < DnsmasqLocalServiceRhel
-      provides :dnsmasq_local_service,
-               platform_family: 'rhel',
-               platform_version: '>= 7'
+    class DnsmasqLocalServiceRhelSystemd < DnsmasqLocalServiceSystemd
+      provides :dnsmasq_local_service do |node|
+        node.platform_family?('rhel') && \
+          Chef::Platform::ServiceHelpers.service_resource_providers
+                                        .include?(:systemd)
+      end
 
       #
       # Generate the `/etc/default/dnsmasq` file and patch usage of it into the

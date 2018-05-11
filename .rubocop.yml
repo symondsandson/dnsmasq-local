@@ -1,4 +1,2 @@
-Metrics/BlockLength:
-  Exclude:
-    - spec/**/*
-    - test/**/*
+inherit_from:
+  - https://raw.githubusercontent.com/socrata-cookbooks/shared/master/files/.rubocop.yml

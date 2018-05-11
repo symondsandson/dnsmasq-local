@@ -3,6 +3,12 @@
 This file is used to list changes made in each version of the dnsmasq-local
 cookbook.
 
+## 2.3.0 (2018-05-03)
+
+- Inherit test configs from a central repo where possible
+- Disable systemd-resolved on Systemd platforms
+- Run integration tests with Microwave
+
 ## v2.2.1 (2018-04-02)
 
 - Resolve a new style offense

@@ -1,4 +1,5 @@
 language: ruby
+rvm: system
 
 branches:
   only:
@@ -17,7 +18,7 @@ services:
   - docker
 
 install:
-  - chef exec bundle install --without=development
+  - chef exec bundle install
 
 env:
   - SUITE=unit
@@ -32,8 +33,8 @@ env:
   - SUITE=remove PLATFORM=centos
 
 script:
-  - if test "$SUITE" = "unit"; then chef exec rake; fi
-  - if test "$SUITE" != "unit"; then chef exec kitchen test $SUITE-$PLATFORM; fi
+  - if test "$SUITE" = "unit"; then chef exec delivery local all; fi
+  - if test "$SUITE" != "unit"; then chef exec microwave test $SUITE-$PLATFORM; fi
 
 stages:
   - name: test
@@ -53,7 +54,7 @@ jobs:
         - git remote set-url origin git@github.com:socrata-cookbooks/dnsmasq-local
       deploy:
         provider: script
-        script: chef exec stove --username socrata --key .travis/client.pem
+        script: rvm use system do chef exec stove --username socrata --key .travis/client.pem
         skip_cleanup: true
 
 notifications:

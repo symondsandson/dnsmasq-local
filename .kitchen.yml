@@ -1,85 +1,11 @@
 ---
-driver:
-  name: dokken
-  privileged: true
-
-transport:
-  name: dokken
-
-provisioner:
-  name: dokken
-
-verifier:
-  name: inspec
-  root_path: /opt/verifier
-  sudo: false
-
-platforms:
-  <% %w[13.7.20 12].each do |chef| %>
-  - name: ubuntu-16.04-chef-<%= chef %>
-    driver:
-      image: ubuntu:16.04
-      chef_version: <%= chef %>
-      pid_one_command: /lib/systemd/systemd
-  - name: ubuntu-14.04-chef-<%= chef %>
-    driver:
-      image: ubuntu:14.04
-      chef_version: <%= chef %>
-      pid_one_command: /sbin/init
-      intermediate_instructions:
-        - RUN dpkg-divert --remove /sbin/initctl
-        - RUN ln -sf /sbin/initctl.distrib /sbin/initctl
-  - name: debian-9-chef-<%= chef %>
-    driver:
-      image: debian:9
-      chef_version: <%= chef %>
-      pid_one_command: /lib/systemd/systemd
-      intermediate_instructions:
-        - RUN echo DISTRIB_CODENAME=stretch > /etc/lsb-release
-        - RUN apt-get update
-        - RUN apt-get -y install systemd gnupg
-  - name: debian-8-chef-<%= chef %>
-    driver:
-      image: debian:8
-      chef_version: <%= chef %>
-      pid_one_command: /lib/systemd/systemd
-      intermediate_instructions:
-       - RUN echo DISTRIB_CODENAME=jessie > /etc/lsb-release
-  - name: centos-7-chef-<%= chef %>
-    driver:
-      image: centos:7
-      chef_version: <%= chef %>
-      pid_one_command: /lib/systemd/systemd
-  - name: centos-6-chef-<%= chef %>
-    driver:
-      image: centos:6
-      chef_version: <%= chef %>
-      pid_one_command: /sbin/init
-      intermediate_instructions:
-        - RUN yum -y install upstart initscripts
-  <% end %>
-
-suites:
-  - name: default
-    run_list:
-      - recipe[dnsmasq-local_test]
-  - name: custom
-    run_list:
-      - recipe[dnsmasq-local_test]
-    attributes:
-      dnsmasq_local:
-        config:
-          bind_interfaces: false
-          cache_size: 64
-          server:
-            - 8.8.8.8
-            - 8.8.4.4
-          address: /example.biz/127.0.0.1
-        options:
-          all_servers: true
-          bad_option: false
-        environment:
-          FAKE: certainly
-  - name: remove
-    run_list:
-      - recipe[dnsmasq-local_test::remove]
+# TODO: As of 2018-05-11, enabling services with update-rc.d is broken in Chef
+#       14 and a Ubuntu 18.04 container on a 14.04 host results in issues with
+#       Dnsmasq's/Systemd's use of PID files.
+microwave:
+  excludes:
+    - name: ubuntu
+      version: 14.04
+      chef: 14
+    - name: ubuntu
+      version: 18.04
