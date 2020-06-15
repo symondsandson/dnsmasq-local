@@ -61,6 +61,7 @@ class Chef # rubocop:disable Style/MultilineIfModifier
       property :config,
                Hash,
                default: {
+                 listen_address: '127.0.0.2',
                  interface: '',
                  cache_size: 0,
                  no_hosts: true,

@@ -1,5 +1,4 @@
-# frozen_string_literal: true
+source 'https://rubygems.org'
 
-require 'open-uri'
-instance_eval(open('https://raw.githubusercontent.com/socrata-cookbooks/' \
-                   'shared/master/files/Gemfile').read)
+gem 'chef', '16.1.16'
+gem 'berkshelf', '7.0.10'

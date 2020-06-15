@@ -27,21 +27,23 @@ class Chef
     #
     # @author Jonathan Hartman <jonathan.hartman@socrata.com>
     class DnsmasqLocalServiceSystemd < DnsmasqLocalService
-      #
-      # On Systemd platforms, we need to check if systemd-resolved is installed
-      # and, if so, disable it. Otherwise it'll fight with dnsmasq over port
-      # 53.
-      #
+
       action :enable do
-        if ::File.exist?('/lib/systemd/system/systemd-resolved.service')
-          service('systemd-resolved') { action %i[stop disable] }
+        service 'systemd-resolved'
+
+        cookbook_file '/etc/systemd/resolved.conf' do
+          cookbook 'dnsmasq-local'
+          source 'resolved.conf'
+          owner 'root'
+          group 'root'
+          mode '0644'
+          action :create
+          notifies :restart, 'service[systemd-resolved]', :immediately
         end
+
         super()
       end
 
-      # We can't be sure what the original state of systemd-resolved was prior
-      # to the original :enable action, so we can't try to restore it as part
-      # of the :disable action.
     end
   end
 end
