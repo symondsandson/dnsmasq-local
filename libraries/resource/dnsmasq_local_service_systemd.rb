@@ -29,7 +29,9 @@ class Chef
     class DnsmasqLocalServiceSystemd < DnsmasqLocalService
 
       action :enable do
-        service 'systemd-resolved'
+        service 'systemd-resolved' do
+          action [:enable, :start]
+        end
 
         cookbook_file '/etc/systemd/resolved.conf' do
           cookbook 'dnsmasq-local'
